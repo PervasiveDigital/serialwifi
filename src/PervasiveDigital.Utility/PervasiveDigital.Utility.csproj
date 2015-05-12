@@ -45,6 +45,6 @@
     <PreBuildEvent>powershell -NoLogo -NonInteractive -Command .'$(SolutionDir)Scripts\SolutionPreBuild.ps1' -Verbose -nuspec:'$(SolutionDir)nuget\$(ProjectName).nuspec' -SolutionDir:'$(SolutionDir)' -ProjectDir:'$(ProjectDir)' -ProjectName:'$(ProjectName)' -TargetDir:'$(TargetDir)' -TargetFileName:'$(TargetFileName)' -ConfigurationName:'$(ConfigurationName)'</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>powershell -NoLogo -NonInteractive -Command .'$(SolutionDir)Scripts\SolutionPostBuild.ps1' -Verbose -NetMFVersion:43 -RepoDir:'$(SolutionDir)..\..\nugetrepo\' -nuspec:'$(SolutionDir)nuget\$(ProjectName).nuspec' -SolutionDir:'$(SolutionDir)' -ProjectDir:'$(ProjectDir)' -ProjectName:'$(ProjectName)' -TargetDir:'$(TargetDir)' -TargetFileName:'$(TargetFileName)' -ConfigurationName:'$(ConfigurationName)'</PostBuildEvent>
+    <PostBuildEvent>powershell -NoLogo -NonInteractive -Command .'$(SolutionDir)Scripts\SolutionPostBuild.ps1' -Verbose -NetMFVersion:43 -RepoDir:'\nugetrepo\' -nuspec:'$(SolutionDir)nuget\$(ProjectName).nuspec' -SolutionDir:'$(SolutionDir)' -ProjectDir:'$(ProjectDir)' -ProjectName:'$(ProjectName)' -TargetDir:'$(TargetDir)' -TargetFileName:'$(TargetFileName)' -ConfigurationName:'$(ConfigurationName)'</PostBuildEvent>
   </PropertyGroup>
 </Project>

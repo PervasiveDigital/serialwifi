@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>PervasiveDigital.Net.Azure</id>
-    <title>Networking helper classes for accessing Azure using Serial Wifi</title>
+    <title>Azure Mobile Services for Serial Wifi</title>
     <version>1.0.0</version>
     <authors>Martin Calsyn</authors>
     <owners>Pervasive Digital LLC</owners>

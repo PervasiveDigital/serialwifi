@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>PervasiveDigital.Hardware.ESP8266</id>
-    <title>.Net Micro Framework Managed driver for ESP8266 wifi</title>
+    <title>ESP8266 driver for .Net Micro Framework</title>
     <version>1.0.0</version>
     <authors>Martin Calsyn</authors>
     <owners>Pervasive Digital LLC</owners>

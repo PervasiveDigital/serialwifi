@@ -41,11 +41,11 @@
   <ItemGroup>
     <ProjectReference Include="..\PervasiveDigital.Net\PervasiveDigital.Net.csproj">
       <Project>{CB2A8B83-5CFB-4DBB-B794-35B3BB1C43A6}</Project>
-      <Name>IngenuityMicro.Net</Name>
+      <Name>PervasiveDigital.Net</Name>
     </ProjectReference>
     <ProjectReference Include="..\PervasiveDigital.Utility\PervasiveDigital.Utility.csproj">
       <Project>{55830EE2-9538-4D00-B62F-C53B4056E96D}</Project>
-      <Name>IngenuityMicro.Utility</Name>
+      <Name>PervasiveDigital.Utility</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Condition="EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
@@ -54,6 +54,6 @@
     <PreBuildEvent>powershell -NoLogo -NonInteractive -Command .'$(SolutionDir)Scripts\SolutionPreBuild.ps1' -Verbose -nuspec:'$(SolutionDir)nuget\$(ProjectName).nuspec' -SolutionDir:'$(SolutionDir)' -ProjectDir:'$(ProjectDir)' -ProjectName:'$(ProjectName)' -TargetDir:'$(TargetDir)' -TargetFileName:'$(TargetFileName)' -ConfigurationName:'$(ConfigurationName)'</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>powershell -NoLogo -NonInteractive -Command .'$(SolutionDir)Scripts\SolutionPostBuild.ps1' -Verbose -NetMFVersion:43 -RepoDir:'$(SolutionDir)..\..\nugetrepo\' -nuspec:'$(SolutionDir)nuget\$(ProjectName).nuspec' -SolutionDir:'$(SolutionDir)' -ProjectDir:'$(ProjectDir)' -ProjectName:'$(ProjectName)' -TargetDir:'$(TargetDir)' -TargetFileName:'$(TargetFileName)' -ConfigurationName:'$(ConfigurationName)'</PostBuildEvent>
+    <PostBuildEvent>powershell -NoLogo -NonInteractive -Command .'$(SolutionDir)Scripts\SolutionPostBuild.ps1' -Verbose -NetMFVersion:43 -RepoDir:'\nugetrepo\' -nuspec:'$(SolutionDir)nuget\$(ProjectName).nuspec' -SolutionDir:'$(SolutionDir)' -ProjectDir:'$(ProjectDir)' -ProjectName:'$(ProjectName)' -TargetDir:'$(TargetDir)' -TargetFileName:'$(TargetFileName)' -ConfigurationName:'$(ConfigurationName)'</PostBuildEvent>
   </PropertyGroup>
 </Project>
