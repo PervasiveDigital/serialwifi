@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>PervasiveDigital.Net</id>
+    <title>Networking helper classes for serial wifi</title>
+    <version>1.0.0</version>
+    <authors>Martin Calsyn</authors>
+    <owners>Pervasive Digital LLC</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
+    <projectUrl>https://github.com/DotNetOpenAutomation/serialwifi</projectUrl>
+    <iconUrl>https://dl.dropboxusercontent.com/u/24099742/Pervasive-Digital-Icon-notext.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>Networking helper classes for .Net Micro Framework on Molecule.Net boards</summary>
+    <description>
+      This library provides Networking helper classes for the .Net Micro Framework on Molecule.Net boards
+    </description>
+    <releaseNotes>Initial release</releaseNotes>
+    <copyright>Copyright 2015 Pervasive Digital LLC</copyright>
+    <tags>NETMF MicroFramework IoT Molecule.Net</tags>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.SPOT.Native" />
+      <frameworkAssembly assemblyName="Microsoft.SPOT.Hardware" />
+    </frameworkAssemblies>
+    <dependencies>
+      <dependency id="PervasiveDigital.Utility" version="1.0.0" />
+    </dependencies>
+  </metadata>
+</package>

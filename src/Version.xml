@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Versions>
+  <Version package="PervasiveDigital.Hardware.ESP8266">
+    <Major>1</Major>
+    <Minor>0</Minor>
+    <Build>0</Build>
+    <Revision>0</Revision>
+    <Suffix></Suffix>
+  </Version>
+  <Version package="PervasiveDigital.Net">
+    <Major>1</Major>
+    <Minor>0</Minor>
+    <Build>0</Build>
+    <Revision>0</Revision>
+    <Suffix></Suffix>
+  </Version>
+  <Version package="PervasiveDigital.Net.Azure.MobileServices">
+    <Major>1</Major>
+    <Minor>0</Minor>
+    <Build>0</Build>
+    <Revision>0</Revision>
+    <Suffix></Suffix>
+  </Version>
+  <Version package="PervasiveDigital.Utility">
+    <Major>1</Major>
+    <Minor>0</Minor>
+    <Build>0</Build>
+    <Revision>0</Revision>
+    <Suffix></Suffix>
+  </Version>
+</Versions>

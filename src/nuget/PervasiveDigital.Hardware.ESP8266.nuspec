@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>PervasiveDigital.Hardware.ESP8266</id>
+    <title>.Net Micro Framework Managed driver for ESP8266 wifi</title>
+    <version>1.0.0</version>
+    <authors>Martin Calsyn</authors>
+    <owners>Pervasive Digital LLC</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
+    <projectUrl>https://github.com/DotNetOpenAutomation/serialwifi</projectUrl>
+    <iconUrl>https://dl.dropboxusercontent.com/u/24099742/Pervasive-Digital-Icon-notext.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>This package includes a .Net Micro Framework Managed driver for the ESP8266 wifi</summary>
+    <description>
+      This library provides .Net Micro Framework support for the ESP8266 family of serial-interface wifi boards
+    </description>
+    <releaseNotes>Initial release</releaseNotes>
+    <copyright>Copyright 2015 Pervasive Digital LLC</copyright>
+    <tags>NETMF MicroFramework IoT Molecule.Net ESP8266</tags>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.SPOT.Native" />
+      <frameworkAssembly assemblyName="Microsoft.SPOT.Hardware" />
+    </frameworkAssemblies>
+    <dependencies>
+      <dependency id="PervasiveDigital.Net" version="1.0.0" />
+      <dependency id="PervasiveDigital.Utility" version="1.0.0" />
+    </dependencies>
+  </metadata>
+</package>
