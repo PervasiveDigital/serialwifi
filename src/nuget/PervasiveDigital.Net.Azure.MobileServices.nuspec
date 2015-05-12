@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <metadata>
-    <id>PervasiveDigital.Net.Azure</id>
+    <id>PervasiveDigital.Net.Azure.MobileServices</id>
     <title>Azure Mobile Services for Serial Wifi</title>
     <version>1.0.0</version>
     <authors>Martin Calsyn</authors>
