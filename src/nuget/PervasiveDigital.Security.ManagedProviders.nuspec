@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>PervasiveDigital.Security.ManagedProviders</id>
+    <title>Managed implementations of selected security functions</title>
+    <version>1.0.3</version>
+    <authors>Martin Calsyn</authors>
+    <owners>Pervasive Digital LLC</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
+    <projectUrl>https://github.com/DotNetOpenAutomation/serialwifi</projectUrl>
+    <iconUrl>https://dl.dropboxusercontent.com/u/24099742/Pervasive-Digital-Icon-notext.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>Managed implementations of selected security functions, including SHA2, HMACSHA256 and more.</summary>
+    <description>
+      This library provides managed implementations of selected security functions, including SHA2, HMACSHA256 and more.
+      This is useful when working with .Net Micro Framework chips that do not have the native Crypto features enabled.
+      The managed implementations will run significantly slower, but enable networking scenarios that would have
+      otherwise been impossible.
+    </description>
+    <releaseNotes>Initial release</releaseNotes>
+    <copyright>Copyright 2015 Pervasive Digital LLC</copyright>
+    <tags>NETMF MicroFramework IoT Molecule.Net</tags>
+    <!--<frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.SPOT.Native" />
+      <frameworkAssembly assemblyName="Microsoft.SPOT.Hardware" />
+    </frameworkAssemblies>-->
+    <dependencies>
+      <dependency id="PervasiveDigital.Utility" version="1.0.0" />
+    </dependencies>
+  </metadata>
+</package>

@@ -21,9 +21,23 @@
     <Revision>0</Revision>
     <Suffix></Suffix>
   </Version>
-  <Version package="PervasiveDigital.Utility">
+  <Version package="PervasiveDigital.Net.Azure.Storage">
     <Major>1</Major>
     <Minor>0</Minor>
+    <Build>0</Build>
+    <Revision>0</Revision>
+    <Suffix></Suffix>
+  </Version>
+  <Version package="PervasiveDigital.Security.ManagedProviders">
+    <Major>1</Major>
+    <Minor>0</Minor>
+    <Build>3</Build>
+    <Revision>0</Revision>
+    <Suffix></Suffix>
+  </Version>
+  <Version package="PervasiveDigital.Utility">
+    <Major>1</Major>
+    <Minor>1</Minor>
     <Build>0</Build>
     <Revision>0</Revision>
     <Suffix></Suffix>
