@@ -72,5 +72,10 @@ namespace PervasiveDigital.Utilities
             }
             return true;
         }
+
+        public static string Format(this string value, params string[] args)
+        {
+            return StringUtilities.Format(value, args);
+        }
     }
 }

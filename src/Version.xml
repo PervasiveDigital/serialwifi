@@ -9,7 +9,7 @@
   </Version>
   <Version package="PervasiveDigital.Net">
     <Major>1</Major>
-    <Minor>0</Minor>
+    <Minor>1</Minor>
     <Build>0</Build>
     <Revision>0</Revision>
     <Suffix></Suffix>
@@ -30,14 +30,14 @@
   </Version>
   <Version package="PervasiveDigital.Security.ManagedProviders">
     <Major>1</Major>
-    <Minor>0</Minor>
-    <Build>3</Build>
+    <Minor>1</Minor>
+    <Build>0</Build>
     <Revision>0</Revision>
     <Suffix></Suffix>
   </Version>
   <Version package="PervasiveDigital.Utility">
     <Major>1</Major>
-    <Minor>1</Minor>
+    <Minor>2</Minor>
     <Build>0</Build>
     <Revision>0</Revision>
     <Suffix></Suffix>

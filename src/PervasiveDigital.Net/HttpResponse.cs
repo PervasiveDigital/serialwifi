@@ -5,24 +5,30 @@ using Microsoft.SPOT;
 
 namespace PervasiveDigital.Net
 {
-    public class HttpResponse : HttpBase
+    public class HttpResponse : HttpBase, IDisposable
     {
         public enum HttpParsingState
         {
             Empty, ResultCode, Headers, Body, Complete, Error
         }
         private HttpParsingState _state = HttpParsingState.Empty;
-        private readonly CircularBuffer _buffer = new CircularBuffer(512, 1, 256);
+        private CircularBuffer _buffer = new CircularBuffer(512, 1, 256);
         private object _lock = new object();
 
         internal HttpResponse()
         {
             this.Body = "";
-            this.StatusCode = -1;
+            this.StatusCode = HttpStatusCode.Unknown;
             this.Reason = "";
         }
 
-        public int StatusCode { get; private set; }
+        public void Dispose()
+        {
+            _buffer = null;
+            Debug.GC(true);
+        }
+
+        public HttpStatusCode StatusCode { get; private set; }
 
         public string Reason { get; private set; }
 
@@ -73,7 +79,7 @@ namespace PervasiveDigital.Net
             // parse it
             var tokens = line.Trim().Split(' ');
             if (tokens.Length > 1)
-                this.StatusCode = int.Parse(tokens[1]);
+                this.StatusCode = (HttpStatusCode)int.Parse(tokens[1]);
             if (tokens.Length > 2)
                 this.Reason = tokens[2];
 

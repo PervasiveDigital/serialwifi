@@ -90,13 +90,9 @@ namespace PervasiveDigital.Net
                 var val = ((DictionaryEntry) item).Value;
 
                 //TODO: Dates and other types and well-known header keys may need special formatting
-                // Content-Length is computed - don't allow an explicit value
-                if (key.ToString() != "Content-Length")
-                {
-                    buffer.AppendLine(key + ": " + val);
-                }
+                buffer.AppendLine(key + ": " + val);
             }
-            if (this.Body != null && this.Body.Length > 0)
+            if (this.Body != null && this.Body.Length > 0 && !this.Headers.Contains("Content-Length"))
             {
                 buffer.AppendLine("Content-Length: " + this.Body.Length);
             }

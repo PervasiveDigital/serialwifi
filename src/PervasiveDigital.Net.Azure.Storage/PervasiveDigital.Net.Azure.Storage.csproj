@@ -29,11 +29,27 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AzureStorageHttpHelper.cs" />
+    <Compile Include="BlobClient.cs" />
+    <Compile Include="CloudStorageAccount.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Class1.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.SPOT.Native" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PervasiveDigital.Net\PervasiveDigital.Net.csproj">
+      <Project>{CB2A8B83-5CFB-4DBB-B794-35B3BB1C43A6}</Project>
+      <Name>PervasiveDigital.Net</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PervasiveDigital.Security.ManagedProviders\PervasiveDigital.Security.ManagedProviders.csproj">
+      <Project>{427FB18C-50A6-4BAF-88B7-AEE79B02F3DA}</Project>
+      <Name>PervasiveDigital.Security.ManagedProviders</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PervasiveDigital.Utility\PervasiveDigital.Utility.csproj">
+      <Project>{55830EE2-9538-4D00-B62F-C53B4056E96D}</Project>
+      <Name>PervasiveDigital.Utility</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Condition="EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <Import Condition="!EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

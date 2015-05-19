@@ -25,7 +25,7 @@
       <frameworkAssembly assemblyName="Microsoft.SPOT.Hardware" />
     </frameworkAssemblies>-->
     <dependencies>
-      <dependency id="PervasiveDigital.Utility" version="1.0.0" />
+      <dependency id="PervasiveDigital.Utility" version="1.2.0" />
     </dependencies>
   </metadata>
 </package>

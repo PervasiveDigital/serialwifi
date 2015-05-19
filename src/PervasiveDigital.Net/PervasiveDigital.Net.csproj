@@ -29,12 +29,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BasicHttpResponse.cs" />
     <Compile Include="DefaultUriParser.cs" />
     <Compile Include="HttpBase.cs" />
     <Compile Include="HttpClient.cs" />
     <Compile Include="HttpRequest.cs" />
     <Compile Include="HttpResponse.cs" />
     <Compile Include="HttpMethod.cs" />
+    <Compile Include="HttpStatusCode.cs" />
     <Compile Include="INetworkAdapter.cs" />
     <Compile Include="ISocket.cs" />
     <Compile Include="IWifiAdapter.cs" />
@@ -51,6 +53,8 @@
     <Compile Include="UriParseComponents.cs" />
     <Compile Include="UriParser.cs" />
     <Compile Include="UriPartial.cs" />
+    <Compile Include="WebException.cs" />
+    <Compile Include="WebExceptionStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.SPOT.Native" />
