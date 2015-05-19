@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>PervasiveDigital.Net.Azure.Storage</id>
+    <title>Azure Storage Services for Serial Wifi</title>
+    <version>1.0.0</version>
+    <authors>Martin Calsyn</authors>
+    <owners>Pervasive Digital LLC</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
+    <projectUrl>https://github.com/DotNetOpenAutomation/serialwifi</projectUrl>
+    <iconUrl>https://dl.dropboxusercontent.com/u/24099742/Pervasive-Digital-Icon-notext.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>Helper classes for accessing Azure Storage using the PervasiveDigital serial-wifi stack</summary>
+    <description>
+      This library provides Networking helper classes for accessing Microsoft Azure Storage Services using the PervasiveDigital serial wifi stack and .Net Micro Framework
+    </description>
+    <releaseNotes>Initial release</releaseNotes>
+    <copyright>Copyright 2015 Pervasive Digital LLC</copyright>
+    <tags>NETMF MicroFramework IoT Molecule.Net Azure</tags>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.SPOT.Native" />
+      <frameworkAssembly assemblyName="Microsoft.SPOT.Hardware" />
+    </frameworkAssemblies>
+    <dependencies>
+      <dependency id="PervasiveDigital.Net" version="1.0.0" />
+      <dependency id="PervasiveDigital.Utility" version="1.1.0" />
+      <dependency id="PervasiveDigital.Security.ManagedProviders" version="1.0.0" />
+    </dependencies>
+  </metadata>
+</package>
