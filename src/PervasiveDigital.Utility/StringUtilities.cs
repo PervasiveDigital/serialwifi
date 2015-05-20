@@ -12,6 +12,7 @@
 // COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 using System;
+using System.Text;
 using Microsoft.SPOT;
 
 namespace PervasiveDigital.Utilities
@@ -101,17 +102,10 @@ namespace PervasiveDigital.Utilities
                                             formatString = indexFormat[1];
                                         }
 
-                                        int index = 0;
 
                                         // no format, just number
-                                        if (Parse.TryParseInt(indexFormat[0], out index))
-                                        {
-                                            bld.Append(FormatParameter(args[index], formatString));
-                                        }
-                                        else
-                                        {
-                                            throw new FormatException(FormatException.ERROR_MESSAGE);
-                                        }
+                                        int index = int.Parse(indexFormat[0]);
+                                        bld.Append(FormatParameter(args[index], formatString));
                                     }
 
                                     endOfLastMatch = endsearch + 1;

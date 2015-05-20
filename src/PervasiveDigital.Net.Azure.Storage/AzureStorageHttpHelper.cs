@@ -3,6 +3,8 @@ using System.Collections;
 using System.IO;
 using Microsoft.SPOT;
 
+using PervasiveDigital.Net;
+
 namespace PervasiveDigital.Net.Azure.Storage
 {
     /// <summary>
@@ -23,7 +25,7 @@ namespace PervasiveDigital.Net.Azure.Storage
         /// <param name="expect100Continue"></param>
         /// <param name="additionalHeaders"></param>
         /// <returns></returns>
-        public static BasicHttpResponse SendWebRequest(string url, string authHeader, string dateHeader, string versionHeader, byte[] fileBytes = null, int contentLength = 0, string httpVerb = "GET", bool expect100Continue = false, Hashtable additionalHeaders = null)
+        public static BasicHttpResponse SendWebRequest(HttpClient client, string url, string authHeader, string dateHeader, string versionHeader, byte[] fileBytes = null, int contentLength = 0, string httpVerb = "GET", bool expect100Continue = false, Hashtable additionalHeaders = null)
         {
             string responseBody = "";
             HttpStatusCode responseStatusCode = HttpStatusCode.Ambiguous;
@@ -31,16 +33,12 @@ namespace PervasiveDigital.Net.Azure.Storage
             try
             {
                 HttpResponse response;
-                using (response = (HttpResponse)request.GetResponse())
+                using (response = client.Send(request))
                 {
                     responseStatusCode = response.StatusCode;
                     Debug.Print("HTTP " + ((int)responseStatusCode).ToString());
 
-                    using (var responseStream = response.GetResponseStream())
-                    using (var reader = new StreamReader(responseStream))
-                    {
-                        responseBody = reader.ReadToEnd();
-                    }
+                    responseBody = response.GetBodyAsString();
 
                     if (response.StatusCode == HttpStatusCode.Created)
                     {
@@ -89,7 +87,8 @@ namespace PervasiveDigital.Net.Azure.Storage
         private static HttpRequest PrepareRequest(string url, string authHeader, string dateHeader, string versionHeader, byte[] fileBytes , int contentLength, string httpVerb, bool expect100Continue = false, Hashtable additionalHeaders = null)
         {
             var uri = new Uri(url);
-            var request = (HttpRequest)WebRequest.Create(uri);
+            var request = new HttpRequest();
+            request.Uri = new Uri(url);
             request.Method = httpVerb;
             request.ContentLength = contentLength;
             request.Headers.Add("x-ms-date", dateHeader);
@@ -109,19 +108,19 @@ namespace PervasiveDigital.Net.Azure.Storage
                 }
             }
 
-            if (AttachFiddler)
-            {
-                request.Proxy = new WebProxy("127.0.0.1", 8888);
-            }
+            //if (AttachFiddler)
+            //{
+            //    request.Proxy = new WebProxy("127.0.0.1", 8888);
+            //}
 
             if (contentLength != 0)
             {
-                request.GetRequestStream().Write(fileBytes, 0, fileBytes.Length);
+                request.Body = fileBytes;
             }
             return request;
         }
 
-        public static bool AttachFiddler { get; set; }
+        //public static bool AttachFiddler { get; set; }
     }
 
 }

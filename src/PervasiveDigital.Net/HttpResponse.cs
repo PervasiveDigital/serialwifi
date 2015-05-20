@@ -17,7 +17,7 @@ namespace PervasiveDigital.Net
 
         internal HttpResponse()
         {
-            this.Body = "";
+            this.Body = null;
             this.StatusCode = HttpStatusCode.Unknown;
             this.Reason = "";
         }
@@ -120,7 +120,8 @@ namespace PervasiveDigital.Net
 
             if (contentLength == -1)
             {
-                ProcessTextBody();
+                Debug.Print("No content length was provided. Chunked encoding and transfer encoding are not supported.");
+                _state = HttpParsingState.Error;
             }
             else
             {
@@ -144,27 +145,6 @@ namespace PervasiveDigital.Net
             }
         }
 
-        private void ProcessTextBody()
-        {
-            // read until the first blank line
-            do
-            {
-                var idxNewline = _buffer.IndexOf(0x0a);
-                if (idxNewline == -1)
-                    return; // need more data
-
-                var data = _buffer.Get(idxNewline + 1);
-                var line = new string(Encoding.UTF8.GetChars(data)).Trim();
-                if (line == "")
-                {
-                    _state = HttpParsingState.Complete;
-                    return;
-                }
-                // append the line to the body
-                this.Body += line;
-            } while (true);
-        }
-
         private void ProcessCountedBody(int contentLength)
         {
             if (_buffer.Size < contentLength)
@@ -172,7 +152,7 @@ namespace PervasiveDigital.Net
 
             try
             {
-                this.Body = new string(Encoding.UTF8.GetChars(_buffer.Get(_buffer.Size)));
+                this.SetBody(_buffer.Get(_buffer.Size));
                 _state = HttpParsingState.Complete;
             }
             catch (Exception)

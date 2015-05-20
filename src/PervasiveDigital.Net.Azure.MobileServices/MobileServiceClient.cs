@@ -119,13 +119,13 @@ namespace PervasiveDigital.Net.Azure.MobileService
             }
 
             this.httpRequest.Uri = new Uri(this.uri.ToString());
-            //this.httpRequest.ContentLength = body.Length;
             this.httpRequest.Method = HttpMethod.Post;
-            this.httpRequest.Body = body.ToString();
+            this.httpRequest.Body = Encoding.UTF8.GetBytes(body.ToString());
+            this.httpRequest.ContentLength = this.httpRequest.Body.Length;
             
             HttpResponse httpResp = this.httpClient.Send(this.httpRequest);
 
-            return httpResp.Body;
+            return httpResp.GetBodyAsString();
         }
 
         /// <summary>
@@ -157,13 +157,13 @@ namespace PervasiveDigital.Net.Azure.MobileService
             }
 
             this.httpRequest.Uri = new Uri(this.uri.ToString());
-            //this.httpRequest.ContentLength = body.Length;
             this.httpRequest.Method = HttpMethod.Patch;
-            this.httpRequest.Body = body.ToString();
+            this.httpRequest.Body = Encoding.UTF8.GetBytes(body.ToString());
+            this.httpRequest.ContentLength = this.httpRequest.Body.Length;
 
             HttpResponse httpResp = this.httpClient.Send(this.httpRequest);
 
-            return httpResp.Body;
+            return httpResp.GetBodyAsString();
         }
 
         /// <summary>
@@ -193,12 +193,12 @@ namespace PervasiveDigital.Net.Azure.MobileService
             }
 
             this.httpRequest.Uri = new Uri(this.uri.ToString());
-            //this.httpRequest.ContentLength = 0;
+            this.httpRequest.ContentLength = 0;
             this.httpRequest.Method = HttpMethod.Delete;
 
             HttpResponse httpResp = this.httpClient.Send(this.httpRequest);
 
-            return (httpResp.StatusCode == 204 /*HttpStatusCode.NoContent*/);
+            return (httpResp.StatusCode == HttpStatusCode.NoContent);
         }
 
         /// <summary>
@@ -237,12 +237,12 @@ namespace PervasiveDigital.Net.Azure.MobileService
             }
 
             this.httpRequest.Uri = new Uri(this.uri.ToString());
-            //this.httpRequest.ContentLength = 0;
+            this.httpRequest.ContentLength = 0;
             this.httpRequest.Method = HttpMethod.Get;
 
             HttpResponse httpResp = this.httpClient.Send(this.httpRequest);
 
-            return httpResp.Body;
+            return httpResp.GetBodyAsString();
         }
 
         /// <summary>

@@ -77,6 +77,36 @@ namespace PervasiveDigital.Net
             }
         }
 
+        public int ContentLength
+        {
+            get
+            {
+                if (this.Headers.Contains("Content-Length"))
+                    return (int)this.Headers["Content-Length"];
+                else
+                    return 0;
+            }
+            set
+            {
+                this.Headers["Content-Length"] = value;
+            }
+        }
+
+        public string Expect
+        {
+            get
+            {
+                if (this.Headers.Contains("Expect"))
+                    return (string)this.Headers["Expect"];
+                else
+                    return null;
+            }
+            set
+            {
+                this.Headers["Expect"] = value;
+            }
+        }
+
         internal void AppendMethod(StringBuilder buffer)
         {
             buffer.AppendLine(this.Method + " " + _uri.PathAndQuery + " HTTP/1.0");
@@ -98,14 +128,6 @@ namespace PervasiveDigital.Net
             }
             // terminate headers with a blank line
             buffer.Append("\r\n");
-        }
-
-        internal void AppendBody(StringBuilder buffer)
-        {
-            if (this.Body != null && this.Body.Length > 0)
-            {
-                buffer.Append(this.Body);
-            }
         }
     }
 }

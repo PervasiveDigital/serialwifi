@@ -1,20 +1,20 @@
 using System;
-using Microsoft.SPOT;
 using System.Collections;
+using System.Text;
+using Microsoft.SPOT;
 
 namespace PervasiveDigital.Net
 {
     public abstract class HttpBase
     {
         private readonly Hashtable _headers = new Hashtable();
+        private byte[] _body;
 
         protected HttpBase()
         {
         }
 
         public Hashtable Headers { get { return _headers; } }
-
-        public string Body { get; set; }
 
         public string Accept
         {
@@ -38,6 +38,37 @@ namespace PervasiveDigital.Net
         {
             get { return (string)_headers["Content-Type"]; }
             set { _headers["Content-Type"] = value; }
+        }
+
+        public byte[] Body
+        {
+            get
+            {
+                return _body;
+            }
+            set
+            {
+                if (value == null)
+                {
+                    _body = null;
+                }
+                else
+                {
+                    _body = new byte[value.Length];
+                    Array.Copy(value, _body, value.Length);
+                }
+            }
+        }
+
+        // This is used internally to reduce the number of allocations and mem-to-mem copies
+        protected void SetBody(byte[] body)
+        {
+            _body = body;
+        }
+
+        public string GetBodyAsString()
+        {
+            return new string(Encoding.UTF8.GetChars(_body));
         }
     }
 }
