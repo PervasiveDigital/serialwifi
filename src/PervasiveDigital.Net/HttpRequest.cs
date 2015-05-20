@@ -109,7 +109,7 @@ namespace PervasiveDigital.Net
 
         internal void AppendMethod(StringBuilder buffer)
         {
-            buffer.AppendLine(this.Method + " " + _uri.PathAndQuery + " HTTP/1.0");
+            buffer.AppendLine(this.Method + " " + _uri.PathAndQuery + " HTTP/1.1");
         }
 
         internal void AppendHeaders(StringBuilder buffer)

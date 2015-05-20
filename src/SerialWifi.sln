@@ -41,6 +41,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PervasiveDigital.Security.M
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PervasiveDigital.Net.Azure.Storage", "PervasiveDigital.Net.Azure.Storage\PervasiveDigital.Net.Azure.Storage.csproj", "{FCEFF7FA-DAC3-46C3-8046-BB698C36C0DE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1A2A6141-9E46-449F-A40B-AEAC5BE9605F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureBlobTest", "tests\AzureBlobTest\AzureBlobTest.csproj", "{E749AC4F-3BCF-4CEB-A095-36109A962B57}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +75,12 @@ Global
 		{FCEFF7FA-DAC3-46C3-8046-BB698C36C0DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCEFF7FA-DAC3-46C3-8046-BB698C36C0DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCEFF7FA-DAC3-46C3-8046-BB698C36C0DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E749AC4F-3BCF-4CEB-A095-36109A962B57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E749AC4F-3BCF-4CEB-A095-36109A962B57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E749AC4F-3BCF-4CEB-A095-36109A962B57}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{E749AC4F-3BCF-4CEB-A095-36109A962B57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E749AC4F-3BCF-4CEB-A095-36109A962B57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E749AC4F-3BCF-4CEB-A095-36109A962B57}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,5 +92,6 @@ Global
 		{DA09F76E-1655-442D-A3AC-3892FA963677} = {783D5000-6184-438A-9B01-3D7090C819E2}
 		{427FB18C-50A6-4BAF-88B7-AEE79B02F3DA} = {783D5000-6184-438A-9B01-3D7090C819E2}
 		{FCEFF7FA-DAC3-46C3-8046-BB698C36C0DE} = {783D5000-6184-438A-9B01-3D7090C819E2}
+		{E749AC4F-3BCF-4CEB-A095-36109A962B57} = {1A2A6141-9E46-449F-A40B-AEAC5BE9605F}
 	EndGlobalSection
 EndGlobal

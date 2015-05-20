@@ -68,7 +68,10 @@ namespace PervasiveDigital.Net
 
         public string GetBodyAsString()
         {
-            return new string(Encoding.UTF8.GetChars(_body));
+            if (_body == null || _body.Length == 0)
+                return "";
+            else
+                return new string(Encoding.UTF8.GetChars(_body));
         }
     }
 }

@@ -58,7 +58,8 @@ namespace PervasiveDigital.Net
             req.AppendHeaders(buffer);
 
             _socket.Send(buffer.ToString());
-            _socket.Send(req.Body);
+            if (req.Body!=null && req.Body.Length>0)
+                _socket.Send(req.Body);
 
             _requestCompletedEvent.WaitOne();
 
@@ -79,7 +80,8 @@ namespace PervasiveDigital.Net
             req.AppendHeaders(buffer);
 
             _socket.Send(buffer.ToString());
-            _socket.Send(req.Body);
+            if (req.Body != null && req.Body.Length > 0)
+                _socket.Send(req.Body);
         }
 
         private void EnsureSocketOpen()

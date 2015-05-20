@@ -3,7 +3,7 @@
   <metadata>
     <id>PervasiveDigital.Net</id>
     <title>Networking helper classes for serial wifi</title>
-    <version>1.1.0</version>
+    <version>1.3.1</version>
     <authors>Martin Calsyn</authors>
     <owners>Pervasive Digital LLC</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
@@ -22,7 +22,7 @@
       <frameworkAssembly assemblyName="Microsoft.SPOT.Hardware" />
     </frameworkAssemblies>
     <dependencies>
-      <dependency id="PervasiveDigital.Utility" version="1.1.0" />
+      <dependency id="PervasiveDigital.Utility" version="1.3.1" />
     </dependencies>
   </metadata>
 </package>
