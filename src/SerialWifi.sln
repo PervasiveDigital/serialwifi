@@ -17,6 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{0DB5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget", "Nuget", "{258FCE06-C495-4151-B81D-71BA31C282E2}"
 	ProjectSection(SolutionItems) = preProject
+		nuget\PervasiveDigital.Diagnostics.nuspec = nuget\PervasiveDigital.Diagnostics.nuspec
 		nuget\PervasiveDigital.Hardware.ESP8266.nuspec = nuget\PervasiveDigital.Hardware.ESP8266.nuspec
 		nuget\PervasiveDigital.Net.Azure.MobileServices.nuspec = nuget\PervasiveDigital.Net.Azure.MobileServices.nuspec
 		nuget\PervasiveDigital.Net.Azure.Storage.nuspec = nuget\PervasiveDigital.Net.Azure.Storage.nuspec
@@ -44,6 +45,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1A2A6141-9E46-449F-A40B-AEAC5BE9605F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureBlobTest", "tests\AzureBlobTest\AzureBlobTest.csproj", "{E749AC4F-3BCF-4CEB-A095-36109A962B57}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PervasiveDigital.Diagnostics", "PervasiveDigital.Diagnostics\PervasiveDigital.Diagnostics.csproj", "{17FD0CC3-7D8E-4685-9090-BF85C3324412}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tagger", "Tagger", "{50469662-C03C-459D-A548-014A2588B4E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiagnosticsTest", "DiagnosticsTest\DiagnosticsTest.csproj", "{12FB8898-8DB0-4570-8454-CAF33D0A2C31}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +88,16 @@ Global
 		{E749AC4F-3BCF-4CEB-A095-36109A962B57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E749AC4F-3BCF-4CEB-A095-36109A962B57}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E749AC4F-3BCF-4CEB-A095-36109A962B57}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{17FD0CC3-7D8E-4685-9090-BF85C3324412}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17FD0CC3-7D8E-4685-9090-BF85C3324412}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17FD0CC3-7D8E-4685-9090-BF85C3324412}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17FD0CC3-7D8E-4685-9090-BF85C3324412}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12FB8898-8DB0-4570-8454-CAF33D0A2C31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12FB8898-8DB0-4570-8454-CAF33D0A2C31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12FB8898-8DB0-4570-8454-CAF33D0A2C31}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{12FB8898-8DB0-4570-8454-CAF33D0A2C31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12FB8898-8DB0-4570-8454-CAF33D0A2C31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12FB8898-8DB0-4570-8454-CAF33D0A2C31}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -93,5 +110,7 @@ Global
 		{427FB18C-50A6-4BAF-88B7-AEE79B02F3DA} = {783D5000-6184-438A-9B01-3D7090C819E2}
 		{FCEFF7FA-DAC3-46C3-8046-BB698C36C0DE} = {783D5000-6184-438A-9B01-3D7090C819E2}
 		{E749AC4F-3BCF-4CEB-A095-36109A962B57} = {1A2A6141-9E46-449F-A40B-AEAC5BE9605F}
+		{17FD0CC3-7D8E-4685-9090-BF85C3324412} = {783D5000-6184-438A-9B01-3D7090C819E2}
+		{12FB8898-8DB0-4570-8454-CAF33D0A2C31} = {1A2A6141-9E46-449F-A40B-AEAC5BE9605F}
 	EndGlobalSection
 EndGlobal
