@@ -153,10 +153,17 @@ namespace PervasiveDigital.Diagnostics
             if ((eventTag.Tag & ListenerReservedEventTags) == ListenerReservedEventTags)
                 throw new Exception("Listener reserved event tag - tags in this range are for internal use by listeners");
 
+            // Short-circuit if there are no listeners. ("If a log entry falls in the forest and no listener is there to hear it...")
+            if (_listeners.Count == 0)
+                return;
+            // Ignore the event if its category is masked off
             if ((category & _categories) == 0)
                 return;
+            // Ignore the event if it falls below the min severity
             if (severity < _minSev)
                 return;
+
+            // Looks like we've got a keeper - log it
             lock (_sync)
             {
                 int blocksize = 0;
