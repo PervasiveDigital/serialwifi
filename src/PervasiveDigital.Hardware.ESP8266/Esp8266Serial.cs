@@ -24,8 +24,8 @@ namespace PervasiveDigital.Hardware.ESP8266
         private readonly byte[] _ipdSequence;
 
         // Circular buffers that will grow in 256-byte increments - one for commands and one for received streams
-        private readonly CircularBuffer _buffer = new CircularBuffer(256, 1, 256);
-        private readonly CircularBuffer _stream = new CircularBuffer(256, 1, 256);
+        private readonly CircularBuffer _buffer = new CircularBuffer(512, 1, 256);
+        private readonly CircularBuffer _stream = new CircularBuffer(512, 1, 256);
 
         public event DataReceivedHandler DataReceived;
         public event SocketClosedHandler SocketClosed;
@@ -374,7 +374,7 @@ namespace PervasiveDigital.Hardware.ESP8266
                                 if (idxNewline == 0)
                                     line = "";
                                 else
-                                    line = ConvertToString(_buffer.Get(idxNewline));
+                                    line = StringUtilities.ConvertToString(_buffer.Get(idxNewline)).Trim();
                                 // eat the newline too
                                 _buffer.Skip(1);
                                 if (line != null && line.Length > 0)
@@ -402,7 +402,7 @@ namespace PervasiveDigital.Hardware.ESP8266
                                     break;
                                 // Convert the introducer
                                 _buffer.Skip(idxIPD);
-                                line = ConvertToString(_buffer.Get(idxColon - idxIPD));
+                                line = StringUtilities.ConvertToString(_buffer.Get(idxColon - idxIPD)).Trim();
                                 _buffer.Skip(1); // eat the colon
 
                                 if (line != null && line.Length > 0)
@@ -433,20 +433,6 @@ namespace PervasiveDigital.Hardware.ESP8266
                     Monitor.Exit(_readLoopMonitor);
                 }
             } while (_cbStream > 0 && _buffer.Size > 0);
-        }
-
-        private string ConvertToString(byte[] input)
-        {
-            string result = null;
-            try
-            {
-                result = new string(Encoding.UTF8.GetChars(input)).Trim();
-            }
-            catch (Exception)
-            {
-                // eat the exception and return null - conversion failures will manifest as an exception here
-            }
-            return result;
         }
 
         private void EnqueueLine(string line)

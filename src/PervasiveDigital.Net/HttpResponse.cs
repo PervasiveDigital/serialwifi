@@ -41,6 +41,11 @@ namespace PervasiveDigital.Net
         {
             lock (_lock)
             {
+                // This makes the response object re-entrant, even though that's not how I would
+                //   use it. Change suggested by becafuel@gmail.com.
+                if (_state == HttpParsingState.Complete || _state == HttpParsingState.Error)
+                    _state = HttpParsingState.Empty;
+
                 _buffer.Put(data);
 
                 switch (_state)
@@ -59,10 +64,10 @@ namespace PervasiveDigital.Net
                     default:  // shouldn't happen, but just in case we get here with Complete or Error state
                         return true;
                 }
-            }
 
-            // return true for completed parsing, false if we need more data
-            return _state == HttpParsingState.Complete || _state == HttpParsingState.Error;
+                // return true for completed parsing, false if we need more data
+                return _state == HttpParsingState.Complete || _state == HttpParsingState.Error;
+            }
         }
 
         private void ProcessResultCode()

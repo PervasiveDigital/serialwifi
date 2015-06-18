@@ -19,6 +19,16 @@ namespace PervasiveDigital.Utilities
 {
     public static class StringUtilities
     {
+        // This avoids the exception that can occur with a simple GetChars, though at the cost of some heap churn
+        public static String ConvertToString(Byte[] byteArray)
+        {
+            var _chars = new char[byteArray.Length];
+            bool _completed;
+            int _bytesUsed, _charsUsed;
+            Encoding.UTF8.GetDecoder().Convert(byteArray, 0, byteArray.Length, _chars, 0, byteArray.Length, false, out _bytesUsed, out _charsUsed, out _completed);
+            return new string(_chars, 0, _charsUsed);
+        }
+
         public static bool IsNullOrEmpty(string s)
         {
             return s == null || s.Length == 0;

@@ -53,8 +53,12 @@ namespace PervasiveDigital.Net
                 isComplete = true;
             }
 
-            if (isComplete && this.ResponseReceived != null)
-                this.ResponseReceived(this, _response);
+            if (isComplete)
+            {
+                if (this.ResponseReceived != null)
+                    this.ResponseReceived(this, _response);
+                this.Reset();
+            }
 
             return isComplete;
         }
