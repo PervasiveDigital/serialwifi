@@ -3,7 +3,7 @@
   <metadata>
     <id>PervasiveDigital.Diagnostics</id>
     <title>Logging and diagnostic functions used by various Pervasive Digital NETMF packages</title>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <authors>Martin Calsyn</authors>
     <owners>Pervasive Digital LLC</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
@@ -22,7 +22,7 @@
       <frameworkAssembly assemblyName="Microsoft.SPOT.Time" />
     </frameworkAssemblies>
     <dependencies>
-      <dependency id="PervasiveDigital.Utility" version="1.3.1" />
+      <dependency id="PervasiveDigital.Utility" version="1.3.2" />
     </dependencies>
   </metadata>
 </package>
