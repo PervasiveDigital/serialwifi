@@ -7,6 +7,7 @@ using System.Net;
 using System.Threading;
 
 using PervasiveDigital.Net;
+using PervasiveDigital.Utilities;
 
 namespace PervasiveDigital.Hardware.ESP8266
 {
@@ -39,6 +40,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         private readonly ManualResetEvent _isInitializedEvent = new ManualResetEvent(false);
         private readonly WifiSocket[] _sockets = new WifiSocket[4];
         private Esp8266Serial _esp;
+        private int _lastSocketUsed = 0;
         private bool _enableDebugOutput;
         private bool _enableVerboseOutput;
 
@@ -66,7 +68,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             _esp.DataReceived += OnDataReceived;
             _esp.SocketClosed += OnSocketClosed;
             _esp.Start();
-            new Thread(BackgroundInitialize).Start();
+            ThreadPool.QueueUserWorkItem(BackgroundInitialize);
         }
 
         public void Dispose()
@@ -99,29 +101,58 @@ namespace PervasiveDigital.Hardware.ESP8266
             get {  return _oplock; }
         }
 
+        /// <summary>
+        /// Connect to an access point
+        /// </summary>
+        /// <param name="ssid">The SSID of the access point that you wish to connect to</param>
+        /// <param name="password">The password for the access point that you wish to connect to</param>
         public void Connect(string ssid, string password)
         {
             EnsureInitialized();
             lock (_oplock)
             {
                 var info = _esp.SendAndReadUntil(JoinAccessPointCommand + '"' + ssid + "\",\"" + password + '"', OK, JoinTimeout);
-                foreach (var line in info)
-                {
-                    if (line.IndexOf("STAIP") != -1)
-                    {
-                        var arg = Unquote(line.Substring(line.IndexOf(',') + 1));
-                        this.IPAddress = IPAddress.Parse(arg);
-                    }
-                    else if (line.IndexOf("STAMAC") != -1)
-                    {
-                        var arg = Unquote(line.Substring(line.IndexOf(',') + 1));
-                        this.MacAddress = arg;
-                    }
-                }
+                // We are going to ignore the returned address data and request the full set of data explicitly below
+                //foreach (var line in info)
+                //{
+                //    if (ParseAddressInfo(line))
+                //        haveAddress = true;
+                //}
 
-                // Update our IP address
-                //GetAddressInformation();
+                // If the connection response did not return address information, then explicitly update our address
+                GetAddressInformation();
             }
+        }
+
+        private bool ParseAddressInfo(string line)
+        {
+            var matched = false;
+
+            if (line.IndexOf("STAIP") != -1)
+            {
+                var arg = Unquote(line.Substring(line.IndexOf(',') + 1));
+                this.IPAddress = IPAddress.Parse(arg);
+                matched = true;
+            }
+            else if (line.IndexOf("STAMAC") != -1)
+            {
+                var arg = Unquote(line.Substring(line.IndexOf(',') + 1));
+                this.MacAddress = arg;
+                matched = true;
+            }
+            else if (line.IndexOf("APIP") != -1)
+            {
+                var arg = Unquote(line.Substring(line.IndexOf(',') + 1));
+                this.AccessPointIPAddress = IPAddress.Parse(arg);
+                matched = true;
+            }
+            else if (line.IndexOf("APMAC") != -1)
+            {
+                var arg = Unquote(line.Substring(line.IndexOf(',') + 1));
+                this.AccessPointMacAddress = arg;
+                matched = true;
+            }
+            return matched;
         }
 
         public void Disconnect()
@@ -140,7 +171,10 @@ namespace PervasiveDigital.Hardware.ESP8266
             lock (_sockets)
             {
                 int iSocket = -1;
-                for (int i = 0; i < _sockets.Length; ++i)
+                // lastSocketUsed is used to make sure that we don't reuse a just-released socket too quickly
+                // It can still happen, but this reduces the probability of it happening if you are using less than five sockets in quick succession.
+                // The chip seems to get upset if we reuse a socket immediately after closing it.
+                for (int i = _lastSocketUsed ; i < _sockets.Length; ++i)
                 {
                     if (_sockets[i] == null)
                     {
@@ -155,6 +189,7 @@ namespace PervasiveDigital.Hardware.ESP8266
 
                 var result = new WifiSocket(this, iSocket, hostNameOrAddress, portNumber, useTcp);
                 _sockets[iSocket] = result;
+                _lastSocketUsed = iSocket;
 
                 return OpenSocket(iSocket);
             }
@@ -241,15 +276,24 @@ namespace PervasiveDigital.Hardware.ESP8266
 
         public IPAddress IPAddress
         {
-            get {  return _address; }
+            get { return _address; }
             private set { _address = value; }
         }
 
-        public ManualResetEvent IsInitializedEvent { get {  return _isInitializedEvent; } }
+        private IPAddress _apaddress = IPAddress.Parse("0.0.0.0");
+
+        public IPAddress AccessPointIPAddress
+        {
+            get { return _apaddress; }
+            private set { _apaddress = value; }
+        }
+
+        public ManualResetEvent IsInitializedEvent { get { return _isInitializedEvent; } }
 
         public string[] Version { get; private set; }
 
         public string MacAddress { get; private set; }
+        public string AccessPointMacAddress { get; private set; }
 
         public AccessPoint[] GetAccessPoints()
         {
@@ -292,15 +336,14 @@ namespace PervasiveDigital.Hardware.ESP8266
         {
             if (_sockets[channel] != null)
             {
-                //REVIEW: would be more efficient to use the AtProtocolClient's event queue and not spin up new threads
                 new Thread(() =>
                 {
-                    _sockets[channel].SocketClosedByPeer();
+                    ThreadPool.QueueUserWorkItem(SocketClosedByPeerThunk, _sockets[channel]);
                 }).Start();
             }
         }
 
-        private void BackgroundInitialize()
+        private void BackgroundInitialize(object unused)
         {
             lock (_oplock)
             {
@@ -366,6 +409,11 @@ namespace PervasiveDigital.Hardware.ESP8266
             }
         }
 
+        private void SocketClosedByPeerThunk(object state)
+        {
+            ((WifiSocket)state).SocketClosedByPeer();
+        }
+
         private void EnsureInitialized()
         {
             _isInitializedEvent.WaitOne();
@@ -377,16 +425,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             var info = _esp.SendAndReadUntil("AT+CIFSR", OK);
             foreach (var line in info)
             {
-                if (line.IndexOf("STAIP") != -1)
-                {
-                    var arg = Unquote(line.Substring(line.IndexOf(',')+1));
-                    this.IPAddress = IPAddress.Parse(arg);
-                }
-                else if (line.IndexOf("STAMAC") != -1)
-                {
-                    var arg = Unquote(line.Substring(line.IndexOf(',')+1));
-                    this.MacAddress = arg;
-                }
+                ParseAddressInfo(line);
             }
         }
 

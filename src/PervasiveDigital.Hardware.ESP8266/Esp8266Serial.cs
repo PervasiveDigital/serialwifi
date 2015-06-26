@@ -347,8 +347,8 @@ namespace PervasiveDigital.Hardware.ESP8266
                                     var data = _stream.Get(_stream.Size);
                                     _noStreamRead.Set();
                                     // Run this in the background so as not to slow down the read loop
-                                    //TODO: Dispatch on a threadpool thread to reduce cost
-                                    new Thread(() => { DataReceived(this, data, channel); }).Start();
+                                    ThreadPool.QueueUserWorkItem(DataReceivedThunk ,new object[] { data, channel });
+                                    //new Thread(() => { DataReceived(this, data, channel); }).Start();
                                 }
                                 catch (Exception)
                                 {
@@ -433,6 +433,21 @@ namespace PervasiveDigital.Hardware.ESP8266
                     Monitor.Exit(_readLoopMonitor);
                 }
             } while (_cbStream > 0 && _buffer.Size > 0);
+        }
+
+        private void DataReceivedThunk(object state)
+        {
+            var args = (object[])state;
+            if (DataReceived != null)
+            {
+                try
+                {
+                    DataReceived(this, (byte[])args[0], (int)args[1]);
+                }
+                catch
+                {
+                }
+            }
         }
 
         private void EnqueueLine(string line)
