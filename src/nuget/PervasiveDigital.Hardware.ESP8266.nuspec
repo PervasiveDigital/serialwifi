@@ -3,7 +3,7 @@
   <metadata>
     <id>PervasiveDigital.Hardware.ESP8266</id>
     <title>ESP8266 driver for .Net Micro Framework</title>
-    <version>1.3.2</version>
+    <version>2.0.0</version>
     <authors>Martin Calsyn</authors>
     <owners>Pervasive Digital LLC</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
@@ -22,8 +22,8 @@
       <frameworkAssembly assemblyName="Microsoft.SPOT.Hardware" />
     </frameworkAssemblies>
     <dependencies>
-      <dependency id="PervasiveDigital.Net" version="1.3.2" />
-      <dependency id="PervasiveDigital.Utility" version="1.3.2" />
+      <dependency id="PervasiveDigital.Net" version="2.0.0" />
+      <dependency id="PervasiveDigital.Utility" version="2.0.0" />
     </dependencies>
   </metadata>
 </package>

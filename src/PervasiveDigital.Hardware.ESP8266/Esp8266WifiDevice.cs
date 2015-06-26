@@ -24,10 +24,27 @@ namespace PervasiveDigital.Hardware.ESP8266
         public const string OK = "OK";
         public const string EchoOffCommand = "ATE0";
         public const string GetFirmwareVersionCommand = "AT+GMR";
+        public const string SetOperatingModeCommand = "AT+CWMODE=";
+        public const string GetOperatingModeCommand = "AT+CWMODE?";
+        public const string GetOperatingModeResponse = "+CWMODE:";
+        public const string SetDhcpMode = "AT+CWDHCP=";
         public const string GetAddressInformationCommand = "AT+CIFSR";
+        public const string SetStationAddressCommand = "AT+CIPSTA=";
+        public const string GetStationAddressCommand = "AT+CIPSTA?";
+        public const string GetStationAddressResponse = "+CIPSTA:";
+        public const string SetApAddressCommand = "AT+CIPAP=";
+        public const string GetApAddressCommand = "AT+CIPAP?";
+        public const string GetApAddressResponse = "+CIPAP:";
+        public const string GetStationMacAddress = "AT+CIPSTAMAC?";
+        public const string GetStationMacAddressResponse = "+CIPSTAMAC:";
+        public const string SetStationMacAddress = "AT+CIPSTAMAC=";
+        public const string GetApMacAddress = "AT+CIPAPMAC?";
+        public const string GetApMacAddressResponse = "+CIPAPMAC:";
+        public const string SetApMacAddress = "AT+CIPAPMAC=";
         public const string ListAccessPointsCommand = "AT+CWLAP";
         public const string JoinAccessPointCommand = "AT+CWJAP=";
         public const string QuitAccessPointCommand = "AT+CWQAP";
+        public const string SleepCommand = "AT+GSLP=";
         public const string SetMuxModeCommand = "AT+CIPMUX=";
         public const string SessionStartCommand = "AT+CIPSTART=";
         public const string SessionEndCommand = "AT+CIPCLOSE=";
@@ -43,6 +60,15 @@ namespace PervasiveDigital.Hardware.ESP8266
         private int _lastSocketUsed = 0;
         private bool _enableDebugOutput;
         private bool _enableVerboseOutput;
+
+        private IPAddress _stationAddress = IPAddress.Parse("0.0.0.0");
+        private IPAddress _stationGateway = IPAddress.Parse("0.0.0.0");
+        private IPAddress _stationNetmask = IPAddress.Parse("0.0.0.0");
+        private IPAddress _apAddress = IPAddress.Parse("0.0.0.0");
+        private IPAddress _apGateway = IPAddress.Parse("0.0.0.0");
+        private IPAddress _apNetmask = IPAddress.Parse("0.0.0.0");
+        private string _stationMacAddress = "";
+        private string _apMacAddress = "";
 
         // operation lock - used to protect any interaction with the esp8266 serial interface
         //   from being trampled on by another operation
@@ -112,47 +138,8 @@ namespace PervasiveDigital.Hardware.ESP8266
             lock (_oplock)
             {
                 var info = _esp.SendAndReadUntil(JoinAccessPointCommand + '"' + ssid + "\",\"" + password + '"', OK, JoinTimeout);
-                // We are going to ignore the returned address data and request the full set of data explicitly below
-                //foreach (var line in info)
-                //{
-                //    if (ParseAddressInfo(line))
-                //        haveAddress = true;
-                //}
-
-                // If the connection response did not return address information, then explicitly update our address
-                GetAddressInformation();
+                // We are going to ignore the returned address data (which varies for different firmware) and request address data from the chip in the property accessors
             }
-        }
-
-        private bool ParseAddressInfo(string line)
-        {
-            var matched = false;
-
-            if (line.IndexOf("STAIP") != -1)
-            {
-                var arg = Unquote(line.Substring(line.IndexOf(',') + 1));
-                this.IPAddress = IPAddress.Parse(arg);
-                matched = true;
-            }
-            else if (line.IndexOf("STAMAC") != -1)
-            {
-                var arg = Unquote(line.Substring(line.IndexOf(',') + 1));
-                this.MacAddress = arg;
-                matched = true;
-            }
-            else if (line.IndexOf("APIP") != -1)
-            {
-                var arg = Unquote(line.Substring(line.IndexOf(',') + 1));
-                this.AccessPointIPAddress = IPAddress.Parse(arg);
-                matched = true;
-            }
-            else if (line.IndexOf("APMAC") != -1)
-            {
-                var arg = Unquote(line.Substring(line.IndexOf(',') + 1));
-                this.AccessPointMacAddress = arg;
-                matched = true;
-            }
-            return matched;
         }
 
         public void Disconnect()
@@ -161,6 +148,71 @@ namespace PervasiveDigital.Hardware.ESP8266
             lock (_oplock)
             {
                 _esp.SendAndExpect(QuitAccessPointCommand, OK);
+            }
+        }
+
+        /// <summary>
+        /// Enter power-saving deep-sleep mode for <paramref name="timeInMs"/> milliseconds.
+        /// Note that for wake-up to work, your hardware has to support deep-sleep wake up 
+        /// by connecting XPD_DCDC to EXT_RSTB with a zero-ohm resistor.
+        /// </summary>
+        /// <param name="timeInMs"></param>
+        public void Sleep(int timeInMs)
+        {
+            lock (_oplock)
+            {
+                _esp.SendAndExpect(SleepCommand + timeInMs.ToString(), OK);
+            }
+        }
+
+        public OperatingMode Mode
+        {
+            get
+            {
+                OperatingMode result = OperatingMode.Unknown;
+                lock (_oplock)
+                {
+                    var info = _esp.SendAndReadUntil(GetOperatingModeCommand, OK);
+                    foreach (var line in info)
+                    {
+                        if (line.IndexOf(GetOperatingModeResponse)==0)
+                        {
+                            var arg = Unquote(line.Substring(line.IndexOf(':') + 1));
+                            switch (arg.Trim())
+                            {
+                                case "0":
+                                    result = OperatingMode.Station;
+                                    break;
+                                case "1":
+                                    result = OperatingMode.AccessPoint;
+                                    break;
+                                case "2":
+                                    result = OperatingMode.Both;
+                                    break;
+                            }
+                        }
+                    }
+                }
+                return result;
+            }
+            set
+            {
+                if (value == OperatingMode.Unknown)
+                    throw new ArgumentException("Invalid value");
+                lock (_oplock)
+                {
+                    _esp.SendAndExpect(SetOperatingModeCommand + (int)value, OK);
+                }
+            }
+        }
+
+        public void EnableDhcp(OperatingMode mode, bool enable)
+        {
+            if (mode == OperatingMode.Unknown)
+                throw new ArgumentException("Invalid value","mode");
+            lock (_oplock)
+            {
+                _esp.SendAndExpect(SetDhcpMode + (int)mode + ',' + (enable ? '1' : '0'), OK);
             }
         }
 
@@ -272,28 +324,114 @@ namespace PervasiveDigital.Hardware.ESP8266
             _powerPin.Write(state);
         }
 
-        private IPAddress _address = IPAddress.Parse("0.0.0.0");
-
-        public IPAddress IPAddress
+        public IPAddress StationIPAddress
         {
-            get { return _address; }
-            private set { _address = value; }
+            get 
+            {
+                lock (_oplock)
+                {
+                    GetStationAddressInfo();
+                }
+                return _stationAddress; 
+            }
+            set
+            {
+                lock (_oplock)
+                {
+                    _esp.SendAndExpect(SetStationAddressCommand + '"' + value.ToString() + '"', OK);
+                }
+            }
         }
 
-        private IPAddress _apaddress = IPAddress.Parse("0.0.0.0");
+        public IPAddress StationGateway
+        {
+            get { return _stationGateway; }
+        }
+
+        public IPAddress StationNetmask
+        {
+            get { return _stationNetmask; }
+        }
 
         public IPAddress AccessPointIPAddress
         {
-            get { return _apaddress; }
-            private set { _apaddress = value; }
+            get 
+            {
+                lock (_oplock)
+                {
+                    GetApAddressInfo();
+                }
+                return _apAddress; 
+            }
+            set
+            {
+                lock (_oplock)
+                {
+                    _esp.SendAndExpect(SetApAddressCommand + '"' + value.ToString() + '"', OK);
+                }
+            }
         }
+
+        public IPAddress AccessPointGateway
+        {
+            get { return _apGateway; }
+        }
+
+        public IPAddress AccessPointNetmask
+        {
+            get { return _apNetmask; }
+        }
+
 
         public ManualResetEvent IsInitializedEvent { get { return _isInitializedEvent; } }
 
         public string[] Version { get; private set; }
 
-        public string MacAddress { get; private set; }
-        public string AccessPointMacAddress { get; private set; }
+        public string StationMacAddress
+        {
+            get
+            {
+                lock (_oplock)
+                {
+                    var info = _esp.SendAndReadUntil(GetStationMacAddress, OK);
+                    foreach (var line in info)
+                    {
+                        ParseAddressInfo(line);
+                    }
+                }
+                return _stationMacAddress;
+            }
+            set
+            {
+                lock (_oplock)
+                {
+                    _esp.SendAndExpect(SetStationMacAddress + '"' + value + '"', OK);
+                }
+            }
+        }
+
+        public string AccessPointMacAddress
+        {
+            get
+            {
+                lock (_oplock)
+                {
+                    var info = _esp.SendAndReadUntil(GetApMacAddress, OK);
+                    foreach (var line in info)
+                    {
+                        ParseAddressInfo(line);
+                    }
+                }
+                return _apMacAddress;
+            }
+            set
+            {
+                lock (_oplock)
+                {
+                    _esp.SendAndExpect(SetApMacAddress + '"' + value + '"', OK);
+                }
+            }
+        }
 
         public AccessPoint[] GetAccessPoints()
         {
@@ -352,7 +490,7 @@ namespace PervasiveDigital.Hardware.ESP8266
                 {
                     while (true)
                     {
-                        if (!_powerPin.Read())
+                        if (_powerPin!=null && !_powerPin.Read())
                         {
                             Thread.Sleep(2000);
                             SetPower(true);
@@ -392,9 +530,6 @@ namespace PervasiveDigital.Hardware.ESP8266
                         // Get the firmware version information
                         this.Version = _esp.SendAndReadUntil(GetFirmwareVersionCommand, OK);
 
-                        // Collect the current IP address information
-                        GetAddressInformation();
-
                         _isInitializedEvent.Set();
                         success = true;
                         if (this.Booted != null)
@@ -419,16 +554,103 @@ namespace PervasiveDigital.Hardware.ESP8266
             _isInitializedEvent.WaitOne();
         }
 
-        private void GetAddressInformation()
+        private void GetStationAddressInfo()
         {
-            // private - no oplock required - always called from within oplock
-            var info = _esp.SendAndReadUntil("AT+CIFSR", OK);
+            var info = _esp.SendAndReadUntil(GetStationAddressCommand, OK);
             foreach (var line in info)
             {
                 ParseAddressInfo(line);
             }
         }
 
+        private void GetApAddressInfo()
+        {
+            var info = _esp.SendAndReadUntil(GetApAddressCommand, OK);
+            foreach (var line in info)
+            {
+                ParseAddressInfo(line);
+            }
+        }
+
+        private bool ParseAddressInfo(string line)
+        {
+            var matched = false;
+
+            if (line.IndexOf(GetStationAddressResponse) == 0)
+            {
+                var tokens = line.Split(':');
+                if (tokens.Length == 3)
+                {
+                    switch (tokens[1].Trim().ToLower())
+                    {
+                        case "ip":
+                            _stationAddress = IPAddress.Parse(Unquote(tokens[2]));
+                            break;
+                        case "gateway":
+                            _stationGateway = IPAddress.Parse(Unquote(tokens[2]));
+                            break;
+                        case "netmask":
+                            _stationNetmask = IPAddress.Parse(Unquote(tokens[2]));
+                            break;
+                    }
+                }
+            }
+            else if (line.IndexOf(GetApAddressResponse) == 0)
+            {
+                var tokens = line.Split(':');
+                if (tokens.Length == 3)
+                {
+                    switch (tokens[1].Trim().ToLower())
+                    {
+                        case "ip":
+                            _apAddress = IPAddress.Parse(Unquote(tokens[2]));
+                            break;
+                        case "gateway":
+                            _apGateway = IPAddress.Parse(Unquote(tokens[2]));
+                            break;
+                        case "netmask":
+                            _apNetmask = IPAddress.Parse(Unquote(tokens[2]));
+                            break;
+                    }
+                }
+            }
+            else if (line.IndexOf(GetStationMacAddressResponse) == 0)
+            {
+                var arg = Unquote(line.Substring(line.IndexOf(':') + 1));
+                _stationMacAddress = arg;
+            }
+            else if (line.IndexOf(GetApMacAddressResponse) == 0)
+            {
+                var arg = Unquote(line.Substring(line.IndexOf(':') + 1));
+                _apMacAddress = arg;
+            }
+            else if (line.IndexOf("STAIP") != -1)
+            {
+                var arg = Unquote(line.Substring(line.IndexOf(',') + 1));
+                _stationAddress = IPAddress.Parse(arg);
+                matched = true;
+            }
+            else if (line.IndexOf("STAMAC") != -1)
+            {
+                var arg = Unquote(line.Substring(line.IndexOf(',') + 1));
+                _stationMacAddress = arg;
+                matched = true;
+            }
+            else if (line.IndexOf("APIP") != -1)
+            {
+                var arg = Unquote(line.Substring(line.IndexOf(',') + 1));
+                _apAddress = IPAddress.Parse(arg);
+                matched = true;
+            }
+            else if (line.IndexOf("APMAC") != -1)
+            {
+                var arg = Unquote(line.Substring(line.IndexOf(',') + 1));
+                _apMacAddress = arg;
+                matched = true;
+            }
+            return matched;
+        }
+        
         private void SetMuxMode(bool enableMux)
         {
             lock (_oplock)

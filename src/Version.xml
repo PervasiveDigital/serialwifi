@@ -1,51 +1,51 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Versions>
   <Version package="PervasiveDigital.Diagnostics">
-    <Major>1</Major>
+    <Major>2</Major>
     <Minor>0</Minor>
-    <Build>1</Build>
+    <Build>0</Build>
     <Revision>0</Revision>
     <Suffix></Suffix>
   </Version>
   <Version package="PervasiveDigital.Hardware.ESP8266">
-    <Major>1</Major>
-    <Minor>3</Minor>
-    <Build>2</Build>
+    <Major>2</Major>
+    <Minor>0</Minor>
+    <Build>0</Build>
     <Revision>0</Revision>
     <Suffix></Suffix>
   </Version>
   <Version package="PervasiveDigital.Net">
-    <Major>1</Major>
-    <Minor>3</Minor>
-    <Build>2</Build>
+    <Major>2</Major>
+    <Minor>0</Minor>
+    <Build>0</Build>
     <Revision>0</Revision>
     <Suffix></Suffix>
   </Version>
   <Version package="PervasiveDigital.Net.Azure.MobileServices">
-    <Major>1</Major>
-    <Minor>3</Minor>
-    <Build>2</Build>
+    <Major>2</Major>
+    <Minor>0</Minor>
+    <Build>0</Build>
     <Revision>0</Revision>
     <Suffix></Suffix>
   </Version>
   <Version package="PervasiveDigital.Net.Azure.Storage">
-    <Major>1</Major>
-    <Minor>3</Minor>
-    <Build>2</Build>
+    <Major>2</Major>
+    <Minor>0</Minor>
+    <Build>0</Build>
     <Revision>0</Revision>
     <Suffix></Suffix>
   </Version>
   <Version package="PervasiveDigital.Security.ManagedProviders">
-    <Major>1</Major>
-    <Minor>3</Minor>
-    <Build>2</Build>
+    <Major>2</Major>
+    <Minor>0</Minor>
+    <Build>0</Build>
     <Revision>0</Revision>
     <Suffix></Suffix>
   </Version>
   <Version package="PervasiveDigital.Utility">
-    <Major>1</Major>
-    <Minor>3</Minor>
-    <Build>2</Build>
+    <Major>2</Major>
+    <Minor>0</Minor>
+    <Build>0</Build>
     <Revision>0</Revision>
     <Suffix></Suffix>
   </Version>
