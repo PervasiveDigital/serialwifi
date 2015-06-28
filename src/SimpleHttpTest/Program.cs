@@ -6,6 +6,7 @@ using PervasiveDigital.Hardware.ESP8266;
 using Microsoft.SPOT;
 using Microsoft.SPOT.Hardware;
 using PervasiveDigital.Net;
+using PervasiveDigital;
 
 namespace SimpleHttpTest
 {
@@ -20,15 +21,25 @@ namespace SimpleHttpTest
             var wifi = new Esp8266WifiDevice(port, _rfPower, null);
             // on Oxygen+Neon, you can use use new NeonWifiDevice() without providing a port
             
-            wifi.Connect("MySsid", "soopersecret");
+            wifi.Connect("XXX", "XXX");
 
             wifi.EnableDebugOutput = true;
+
+            Debug.Print("Station IP address : " + wifi.StationIPAddress.ToString());
+            Debug.Print("Station MAC address : " + wifi.StationMacAddress);
+            Debug.Print("Station Gateway address : " + wifi.StationGateway.ToString());
+            Debug.Print("Station netmask : " + wifi.StationNetmask.ToString());
+
+            Debug.Print("AP IP address : " + wifi.AccessPointIPAddress.ToString());
+            Debug.Print("AP MAC address : " + wifi.AccessPointMacAddress);
+            Debug.Print("AP Gateway address : " + wifi.AccessPointGateway.ToString());
+            Debug.Print("AP netmask : " + wifi.AccessPointNetmask.ToString());
 
             var sntp = new SntpClient(wifi, "time1.google.com");
             sntp.Start();
 
-            var httpClient = new HttpClient(wifi, "www.example.com");
-            var request = new HttpRequest();
+            var httpClient = new HttpClient(wifi, "www.hell.org");
+            var request = new HttpRequest(new Uri("http://www.hell.org/"));
             request.ResponseReceived += HttpResponseReceived;
             httpClient.SendAsync(request);
 

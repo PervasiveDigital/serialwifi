@@ -219,8 +219,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         public ISocket OpenSocket(string hostNameOrAddress, int portNumber, bool useTcp)
         {
             EnsureInitialized();
-            // We lock on sockets here - we will claim oplock in OpenSocket(int socket)
-            lock (_sockets)
+            lock (_oplock)
             {
                 int iSocket = -1;
                 // lastSocketUsed is used to make sure that we don't reuse a just-released socket too quickly
@@ -287,12 +286,9 @@ namespace PervasiveDigital.Hardware.ESP8266
         internal void DeleteSocket(int socket)
         {
             EnsureInitialized();
-            lock (_sockets)
+            if (socket >= 0 && socket <= _sockets.Length)
             {
-                if (socket >= 0 && socket <= _sockets.Length)
-                {
-                    _sockets[socket] = null;
-                }
+                _sockets[socket] = null;
             }
         }
 
@@ -474,10 +470,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         {
             if (_sockets[channel] != null)
             {
-                new Thread(() =>
-                {
-                    ThreadPool.QueueUserWorkItem(SocketClosedByPeerThunk, _sockets[channel]);
-                }).Start();
+                ThreadPool.QueueUserWorkItem(SocketClosedByPeerThunk, _sockets[channel]);
             }
         }
 

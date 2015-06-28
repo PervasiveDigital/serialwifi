@@ -1,5 +1,4 @@
 [CmdletBinding()]
-
 param($RepoDir, $SolutionDir, $ProjectDir, $ProjectName, $TargetDir, $TargetFileName, $ConfigurationName, $nuspec, $NetMFVersion, [switch]$Disable)
 
 if(-not ($RepoDir -and $SolutionDir -and $ProjectDir -and $ProjectName -and $TargetDir -and $TargetFileName -and $ConfigurationName))

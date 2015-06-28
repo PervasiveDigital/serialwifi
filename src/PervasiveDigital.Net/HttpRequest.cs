@@ -21,6 +21,18 @@ namespace PervasiveDigital.Net
             this.Method = HttpMethod.Get;
         }
 
+        public HttpRequest(Uri uri)
+        {
+            this.Uri = uri;
+            this.Method = HttpMethod.Get;
+        }
+
+        public HttpRequest(string method, Uri uri)
+        {
+            this.Uri = uri;
+            this.Method = method;
+        }
+
         /// <summary>
         /// Reset the state of the request so that the request can be re-sent.
         /// You can change the body and headers after reset and before resending.

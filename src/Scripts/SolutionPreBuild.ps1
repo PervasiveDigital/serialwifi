@@ -1,7 +1,8 @@
-
 [CmdletBinding()]
-
 param($SolutionDir, $ProjectDir, $ProjectName, $TargetDir, $TargetFileName, $ConfigurationName, $nuspec, [switch]$Disable)
+
+# For reasons unknown, this is required when I build on Win10
+Get-Command Get-Content
 
 # Regular expression pattern to find the version in the build number 
 # and then apply it to the assemblies
