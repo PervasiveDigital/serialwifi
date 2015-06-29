@@ -23,11 +23,15 @@ namespace PervasiveDigital.Hardware.ESP8266
         public const string AT = "AT";
         public const string OK = "OK";
         public const string EchoOffCommand = "ATE0";
+        public const string ResetCommand = "AT+RST";
         public const string GetFirmwareVersionCommand = "AT+GMR";
         public const string SetOperatingModeCommand = "AT+CWMODE=";
         public const string GetOperatingModeCommand = "AT+CWMODE?";
         public const string GetOperatingModeResponse = "+CWMODE:";
         public const string SetDhcpMode = "AT+CWDHCP=";
+        public const string SetAccessPointModeCommand = "AT+CWSAP=";
+        public const string GetAccessPointModeCommand = "AT+CWSAP?";
+        public const string GetAccessPointModeResponse = "+CWSAP:";
         public const string GetAddressInformationCommand = "AT+CIFSR";
         public const string SetStationAddressCommand = "AT+CIPSTA=";
         public const string GetStationAddressCommand = "AT+CIPSTA?";
@@ -127,6 +131,31 @@ namespace PervasiveDigital.Hardware.ESP8266
             get {  return _oplock; }
         }
 
+        public void Reset(bool force)
+        {
+            if (!force)
+                EnsureInitialized();
+            lock (_oplock)
+            {
+                int retries = 0;
+                while (true)
+                {
+                    _esp.SendAndReadUntil(ResetCommand, OK);
+                    try
+                    {
+                        _esp.Find("ready", 20000);
+                        break;
+                    }
+                    catch
+                    {
+                        if (++retries > 3)
+                            throw;
+                    }
+                }
+                BackgroundInitialize(null);
+            }
+        }
+
         /// <summary>
         /// Connect to an access point
         /// </summary>
@@ -159,6 +188,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         /// <param name="timeInMs"></param>
         public void Sleep(int timeInMs)
         {
+            EnsureInitialized();
             lock (_oplock)
             {
                 _esp.SendAndExpect(SleepCommand + timeInMs.ToString(), OK);
@@ -169,6 +199,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         {
             get
             {
+                EnsureInitialized();
                 OperatingMode result = OperatingMode.Unknown;
                 lock (_oplock)
                 {
@@ -180,13 +211,13 @@ namespace PervasiveDigital.Hardware.ESP8266
                             var arg = Unquote(line.Substring(line.IndexOf(':') + 1));
                             switch (arg.Trim())
                             {
-                                case "0":
+                                case "1":
                                     result = OperatingMode.Station;
                                     break;
-                                case "1":
+                                case "2":
                                     result = OperatingMode.AccessPoint;
                                     break;
-                                case "2":
+                                case "3":
                                     result = OperatingMode.Both;
                                     break;
                             }
@@ -199,10 +230,134 @@ namespace PervasiveDigital.Hardware.ESP8266
             {
                 if (value == OperatingMode.Unknown)
                     throw new ArgumentException("Invalid value");
+                EnsureInitialized();
                 lock (_oplock)
                 {
-                    _esp.SendAndExpect(SetOperatingModeCommand + (int)value, OK);
+                    int arg = -1;
+                    switch (value)
+                    {
+                        case OperatingMode.Station:
+                            arg = 1;
+                            break;
+                        case OperatingMode.AccessPoint:
+                            arg = 2;
+                            break;
+                        case OperatingMode.Both:
+                            arg = 3;
+                            break;
+                    }
+                    _esp.SendAndExpect(SetOperatingModeCommand + arg, OK);
+                    // Reset the chip
+                    Reset(false);
                 }
+            }
+        }
+
+        /// <summary>
+        /// When you want to use your ESP8266 as an access point (softAP mode) then use
+        /// this method to set the ssid and password that your access point will use
+        /// when authenticating new clients.
+        /// </summary>
+        /// <param name="ssid">The ssid that will be advertised to potential clients</param>
+        /// <param name="password">The password that a new client must provide. NOTE: MUST BE NUMERIC</param>
+        /// <param name="channel">The radio channel that your access point will use. Avoid conflicts with other nearby access points</param>
+        /// <param name="ecn">The security mode(s) supported by your access point.  If you use Open, then no password will be required for new clients.</param>
+        public void ConfigureAccessPoint(string ssid, string password, int channel, Ecn ecn)
+        {
+            if (ecn == Ecn.Unknown || ecn == Ecn.WEP)
+                throw new ArgumentException("Invalid value", "ecn");
+            EnsureInitialized();
+            lock (_oplock)
+            {
+                _esp.SendAndExpect(SetAccessPointModeCommand + 
+                    '"' + ssid + "\"," +
+                    '"' + password + "\"," + 
+                    channel + "," + 
+                    (int)ecn, OK);
+            }
+        }
+
+        public string AccessPointSsid
+        {
+            get
+            {
+                EnsureInitialized();
+                lock (_oplock)
+                {
+                    var info = _esp.SendAndReadUntil(GetAccessPointModeCommand, OK);
+                    foreach (var line in info)
+                    {
+                        if (line.IndexOf(GetAccessPointModeResponse) == 0)
+                        {
+                            var tokens = line.Substring(line.IndexOf(':')).Split(',');
+                            return Unquote(tokens[0]);
+                        }
+                    }
+                }
+                return null;
+            }
+        }
+
+        public string AccessPointPassword
+        {
+            get
+            {
+                EnsureInitialized();
+                lock (_oplock)
+                {
+                    var info = _esp.SendAndReadUntil(GetAccessPointModeCommand, OK);
+                    foreach (var line in info)
+                    {
+                        if (line.IndexOf(GetAccessPointModeResponse) == 0)
+                        {
+                            var tokens = line.Substring(line.IndexOf(':')).Split(',');
+                            return Unquote(tokens[1]);
+                        }
+                    }
+                }
+                return null;
+            }
+        }
+
+        public int AccessPointChannel
+        {
+            get
+            {
+                EnsureInitialized();
+                lock (_oplock)
+                {
+                    var info = _esp.SendAndReadUntil(GetAccessPointModeCommand, OK);
+                    foreach (var line in info)
+                    {
+                        if (line.IndexOf(GetAccessPointModeResponse) == 0)
+                        {
+                            var tokens = line.Substring(line.IndexOf(':')).Split(',');
+                            return int.Parse(tokens[2]);
+                        }
+                    }
+                }
+                return -1;
+            }
+        }
+
+        public Ecn AccessPointEcn
+        {
+            get
+            {
+                EnsureInitialized();
+                lock (_oplock)
+                {
+                    var info = _esp.SendAndReadUntil(GetAccessPointModeCommand, OK);
+                    foreach (var line in info)
+                    {
+                        if (line.IndexOf(GetAccessPointModeResponse) == 0)
+                        {
+                            var tokens = line.Substring(line.IndexOf(':')).Split(',');
+                            return (Ecn)int.Parse(tokens[3]);
+                        }
+                    }
+                }
+                return Ecn.Unknown;
             }
         }
 
@@ -210,9 +365,24 @@ namespace PervasiveDigital.Hardware.ESP8266
         {
             if (mode == OperatingMode.Unknown)
                 throw new ArgumentException("Invalid value","mode");
+            EnsureInitialized();
             lock (_oplock)
             {
-                _esp.SendAndExpect(SetDhcpMode + (int)mode + ',' + (enable ? '1' : '0'), OK);
+                int arg = -1;
+                switch (mode)
+                {
+                    case OperatingMode.Station:
+                        arg = 1;
+                        break;
+                    case OperatingMode.AccessPoint:
+                        arg = 0;
+                        break;
+                    case OperatingMode.Both:
+                        arg = 2;
+                        break;
+
+                }
+                _esp.SendAndExpect(SetDhcpMode + arg + ',' + (enable ? '1' : '0'), OK);
             }
         }
 
@@ -324,6 +494,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         {
             get 
             {
+                EnsureInitialized();
                 lock (_oplock)
                 {
                     GetStationAddressInfo();
@@ -332,6 +503,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             }
             set
             {
+                EnsureInitialized();
                 lock (_oplock)
                 {
                     _esp.SendAndExpect(SetStationAddressCommand + '"' + value.ToString() + '"', OK);
@@ -353,6 +525,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         {
             get 
             {
+                EnsureInitialized();
                 lock (_oplock)
                 {
                     GetApAddressInfo();
@@ -361,6 +534,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             }
             set
             {
+                EnsureInitialized();
                 lock (_oplock)
                 {
                     _esp.SendAndExpect(SetApAddressCommand + '"' + value.ToString() + '"', OK);
@@ -387,6 +561,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         {
             get
             {
+                EnsureInitialized();
                 lock (_oplock)
                 {
                     var info = _esp.SendAndReadUntil(GetStationMacAddress, OK);
@@ -399,6 +574,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             }
             set
             {
+                EnsureInitialized();
                 lock (_oplock)
                 {
                     _esp.SendAndExpect(SetStationMacAddress + '"' + value + '"', OK);
@@ -410,6 +586,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         {
             get
             {
+                EnsureInitialized();
                 lock (_oplock)
                 {
                     var info = _esp.SendAndReadUntil(GetApMacAddress, OK);
@@ -422,6 +599,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             }
             set
             {
+                EnsureInitialized();
                 lock (_oplock)
                 {
                     _esp.SendAndExpect(SetApMacAddress + '"' + value + '"', OK);

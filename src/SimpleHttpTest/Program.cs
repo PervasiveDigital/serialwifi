@@ -1,3 +1,4 @@
+#define ACCESS_POINT
 using System;
 using System.Collections;
 using System.IO.Ports;
@@ -20,15 +21,27 @@ namespace SimpleHttpTest
             var port = new SerialPort("COM2", 115200, Parity.None, 8, StopBits.One);
             var wifi = new Esp8266WifiDevice(port, _rfPower, null);
             // on Oxygen+Neon, you can use use new NeonWifiDevice() without providing a port
-            
-            wifi.Connect("XXX", "XXX");
+            //wifi.EnableDebugOutput = true;
+            //wifi.EnableVerboseOutput = true;
 
-            wifi.EnableDebugOutput = true;
+#if ACCESS_POINT
+            wifi.Mode = OperatingMode.Both;
+            wifi.ConfigureAccessPoint("serwifitest", "24681234", 5, Ecn.WPA2_PSK);
+            wifi.EnableDhcp(OperatingMode.AccessPoint, false);
+#else
+            wifi.Mode = OperatingMode.Station;
+#endif
+            wifi.Connect("XXX", "XXX");
 
             Debug.Print("Station IP address : " + wifi.StationIPAddress.ToString());
             Debug.Print("Station MAC address : " + wifi.StationMacAddress);
             Debug.Print("Station Gateway address : " + wifi.StationGateway.ToString());
             Debug.Print("Station netmask : " + wifi.StationNetmask.ToString());
+
+            Debug.Print("AP SSID : " + wifi.AccessPointSsid);
+            Debug.Print("AP Password : " + wifi.AccessPointPassword);
+            Debug.Print("AP Channel : " + wifi.AccessPointChannel);
+            Debug.Print("AP ECN : " + wifi.AccessPointEcn);
 
             Debug.Print("AP IP address : " + wifi.AccessPointIPAddress.ToString());
             Debug.Print("AP MAC address : " + wifi.AccessPointMacAddress);
@@ -38,8 +51,8 @@ namespace SimpleHttpTest
             var sntp = new SntpClient(wifi, "time1.google.com");
             sntp.Start();
 
-            var httpClient = new HttpClient(wifi, "www.hell.org");
-            var request = new HttpRequest(new Uri("http://www.hell.org/"));
+            var httpClient = new HttpClient(wifi, "www.example.com");
+            var request = new HttpRequest(new Uri("http://www.example.com/"));
             request.ResponseReceived += HttpResponseReceived;
             httpClient.SendAsync(request);
 
