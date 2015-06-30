@@ -3,7 +3,7 @@
   <metadata>
     <id>PervasiveDigital.Utility</id>
     <title>Utility functions used by various Pervasive Digital NETMF packages</title>
-    <version>2.0.0-beta</version>
+    <version>2.0.1-beta</version>
     <authors>Martin Calsyn</authors>
     <owners>Pervasive Digital LLC</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>

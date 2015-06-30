@@ -3,49 +3,49 @@
   <Version package="PervasiveDigital.Diagnostics">
     <Major>2</Major>
     <Minor>0</Minor>
-    <Build>0</Build>
+    <Build>1</Build>
     <Revision>0</Revision>
     <Suffix>-beta</Suffix>
   </Version>
   <Version package="PervasiveDigital.Hardware.ESP8266">
     <Major>2</Major>
     <Minor>0</Minor>
-    <Build>0</Build>
+    <Build>1</Build>
     <Revision>0</Revision>
     <Suffix>-beta</Suffix>
   </Version>
   <Version package="PervasiveDigital.Net">
     <Major>2</Major>
     <Minor>0</Minor>
-    <Build>0</Build>
+    <Build>1</Build>
     <Revision>0</Revision>
     <Suffix>-beta</Suffix>
   </Version>
   <Version package="PervasiveDigital.Net.Azure.MobileServices">
     <Major>2</Major>
     <Minor>0</Minor>
-    <Build>0</Build>
+    <Build>1</Build>
     <Revision>0</Revision>
     <Suffix>-beta</Suffix>
   </Version>
   <Version package="PervasiveDigital.Net.Azure.Storage">
     <Major>2</Major>
     <Minor>0</Minor>
-    <Build>0</Build>
+    <Build>1</Build>
     <Revision>0</Revision>
     <Suffix>-beta</Suffix>
   </Version>
   <Version package="PervasiveDigital.Security.ManagedProviders">
     <Major>2</Major>
     <Minor>0</Minor>
-    <Build>0</Build>
+    <Build>1</Build>
     <Revision>0</Revision>
     <Suffix>-beta</Suffix>
   </Version>
   <Version package="PervasiveDigital.Utility">
     <Major>2</Major>
     <Minor>0</Minor>
-    <Build>0</Build>
+    <Build>1</Build>
     <Revision>0</Revision>
     <Suffix>-beta</Suffix>
   </Version>
