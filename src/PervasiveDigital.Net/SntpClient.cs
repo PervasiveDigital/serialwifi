@@ -19,7 +19,7 @@ namespace PervasiveDigital.Net
         private DateTime _lastTimeRetrieved;
 
         public SntpClient(INetworkAdapter adapter, string host)
-            : this(adapter, host, new TimeSpan(1, 0, 0))
+            : this(adapter, host, new TimeSpan(24, 0, 0))
         {
         }
 

@@ -25,7 +25,18 @@ namespace PervasiveDigital.Hardware.ESP8266
             _fTcp = fTcp;
         }
 
-        public string Hostname { get {  return _hostname; } }
+        internal WifiSocket(Esp8266WifiDevice device, int iSocket, int port)
+        {
+            _parent = device;
+            _iSocket = iSocket;
+            _port = port;
+            _hostname = null;
+            _fTcp = true; // TEMP CODE
+        }
+
+        public int Id { get { return _iSocket; } }
+
+        public string Hostname { get { return _hostname; } }
         
         public int Port { get {  return _port; } }
         

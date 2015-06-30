@@ -30,6 +30,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AccessPoint.cs" />
+    <Compile Include="AccessPointClient.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="Ecn.cs" />
     <Compile Include="Esp8266Serial.cs" />

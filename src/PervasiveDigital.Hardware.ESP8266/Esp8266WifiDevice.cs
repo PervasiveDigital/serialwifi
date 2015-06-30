@@ -14,6 +14,7 @@ namespace PervasiveDigital.Hardware.ESP8266
     public delegate void WifiBootedEventHandler(object sender, EventArgs args);
     public delegate void WifiErrorEventHandler(object sender, EventArgs args);
     public delegate void WifiConnectionStateEventHandler(object sender, EventArgs args);
+    public delegate void ServerConnectionOpenedHandler(object sender, WifiSocket socket);
 
     public class Esp8266WifiDevice : IWifiAdapter, IDisposable
     {
@@ -48,10 +49,12 @@ namespace PervasiveDigital.Hardware.ESP8266
         public const string ListAccessPointsCommand = "AT+CWLAP";
         public const string JoinAccessPointCommand = "AT+CWJAP=";
         public const string QuitAccessPointCommand = "AT+CWQAP";
+        public const string ListConnectedClientsCommand = "AT+CWLIF";
         public const string SleepCommand = "AT+GSLP=";
         public const string SetMuxModeCommand = "AT+CIPMUX=";
         public const string SessionStartCommand = "AT+CIPSTART=";
         public const string SessionEndCommand = "AT+CIPCLOSE=";
+        public const string ServerCommand = "AT+CIPSERVER=";
         public const string LinkedReply = "Linked";
         public const string SendCommand = "AT+CIPSEND=";
         public const string SendCommandReply = "SEND OK";
@@ -60,6 +63,8 @@ namespace PervasiveDigital.Hardware.ESP8266
 
         private readonly ManualResetEvent _isInitializedEvent = new ManualResetEvent(false);
         private readonly WifiSocket[] _sockets = new WifiSocket[4];
+        private ServerConnectionOpenedHandler _onServerConnectionOpenedHandler;
+        private int _inboundPort = -1;
         private Esp8266Serial _esp;
         private int _lastSocketUsed = 0;
         private bool _enableDebugOutput;
@@ -97,6 +102,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             _esp = new Esp8266Serial(port);
             _esp.DataReceived += OnDataReceived;
             _esp.SocketClosed += OnSocketClosed;
+            _esp.SocketOpened += _esp_SocketOpened;
             _esp.Start();
             ThreadPool.QueueUserWorkItem(BackgroundInitialize);
         }
@@ -178,6 +184,24 @@ namespace PervasiveDigital.Hardware.ESP8266
             {
                 _esp.SendAndExpect(QuitAccessPointCommand, OK);
             }
+        }
+
+        public void CreateServer(int port, ServerConnectionOpenedHandler onServerConnectionOpenedHandler)
+        {
+            EnsureInitialized();
+            lock (_oplock)
+            {
+                _esp.SendAndExpect(ServerCommand + "1," + port, OK);
+                _inboundPort = port;
+                _onServerConnectionOpenedHandler = onServerConnectionOpenedHandler;
+            }
+        }
+
+        public void DeleteServer()
+        {
+            EnsureInitialized();
+
+            Reset(false);
         }
 
         /// <summary>
@@ -635,6 +659,33 @@ namespace PervasiveDigital.Hardware.ESP8266
             return (AccessPoint[])result.ToArray(typeof(AccessPoint));
         }
 
+        public AccessPointClient[] GetConnectedClients()
+        {
+            ArrayList result = new ArrayList();
+
+            EnsureInitialized();
+            lock (_oplock)
+            {
+                var response = _esp.SendAndReadUntil(ListConnectedClientsCommand, OK);
+                foreach (var line in response)
+                {
+                    if (line != null && line.Length > 0)
+                    {
+                        result.Add(line);
+                        var tokens = line.Split(',');
+                        if (tokens.Length > 1)
+                        {
+                            var addr = IPAddress.Parse(tokens[0]);
+                            var mac = tokens[1].Trim();
+                            result.Add(new AccessPointClient(addr, mac));
+                        }
+                    }
+                }
+            }
+            return (AccessPointClient[])result.ToArray(typeof(AccessPointClient));
+        }
+
+
         private void OnDataReceived(object sender, byte[] stream, int channel)
         {
             if (_sockets[channel] != null)
@@ -648,8 +699,37 @@ namespace PervasiveDigital.Hardware.ESP8266
         {
             if (_sockets[channel] != null)
             {
-                ThreadPool.QueueUserWorkItem(SocketClosedByPeerThunk, _sockets[channel]);
+                ThreadPool.QueueUserWorkItem((state) =>
+                    {
+                        ((WifiSocket)state).SocketClosedByPeer();
+                    }, _sockets[channel]);
             }
+        }
+
+        void _esp_SocketOpened(object sender, int channel, out bool fHandled)
+        {
+            // This could be the result of an outgoing or incoming socket connection
+
+            if (_onServerConnectionOpenedHandler==null || _sockets[channel]!=null)
+            {
+                fHandled = false;
+                return;
+            }
+
+            // Create a socket object - TODO: get tcp and port information
+            var socket = new WifiSocket(this, channel, _inboundPort);
+            _sockets[channel] = socket;
+
+            // Fire connection-received event so that the app knows there is a new socket to service
+            if (_onServerConnectionOpenedHandler != null)
+            {
+                ThreadPool.QueueUserWorkItem((state) =>
+                {
+                    _onServerConnectionOpenedHandler(this, ((WifiSocket)state));
+                }, socket);
+            }
+
+            fHandled = false;
         }
 
         private void BackgroundInitialize(object unused)
@@ -713,11 +793,6 @@ namespace PervasiveDigital.Hardware.ESP8266
                     }
                 } while (!success);
             }
-        }
-
-        private void SocketClosedByPeerThunk(object state)
-        {
-            ((WifiSocket)state).SocketClosedByPeer();
         }
 
         private void EnsureInitialized()

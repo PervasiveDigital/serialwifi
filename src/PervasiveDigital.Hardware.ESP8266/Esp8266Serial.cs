@@ -11,6 +11,7 @@ namespace PervasiveDigital.Hardware.ESP8266
     internal class Esp8266Serial
     {
         public delegate void DataReceivedHandler(object sender, byte[] stream, int channel);
+        public delegate void SocketOpenedHandler(object sender, int channel, out bool fHandled);
         public delegate void SocketClosedHandler(object sender, int channel);
 
         public const int DefaultCommandTimeout = 10000;
@@ -28,6 +29,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         private readonly CircularBuffer _stream = new CircularBuffer(512, 1, 256);
 
         public event DataReceivedHandler DataReceived;
+        public event SocketOpenedHandler SocketOpened;
         public event SocketClosedHandler SocketClosed;
 
         private int _cbStream = 0;
@@ -390,7 +392,21 @@ namespace PervasiveDigital.Hardware.ESP8266
                                             this.SocketClosed(this, channel);
                                     }
                                     else
-                                        EnqueueLine(line);
+                                    {
+                                        var idxConnect = line.IndexOf(",CONNECT");
+                                        if (idxConnect != -1)
+                                        {
+                                            // Handle socket-opened notification
+                                            bool fHandled = false;
+                                            var channel = int.Parse(line.Substring(0, idxConnect));
+                                            if (this.SocketOpened != null)
+                                                this.SocketOpened(this, channel, out fHandled);
+                                            if (!fHandled)
+                                                EnqueueLine(line);
+                                        }
+                                        else
+                                            EnqueueLine(line);
+                                    }
                                 }
                             }
                             else if (idxIPD!=-1) // idxIPD found before newline
