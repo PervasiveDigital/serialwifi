@@ -11,11 +11,6 @@ using PervasiveDigital.Utilities;
 
 namespace PervasiveDigital.Hardware.ESP8266
 {
-    public delegate void WifiBootedEventHandler(object sender, EventArgs args);
-    public delegate void WifiErrorEventHandler(object sender, EventArgs args);
-    public delegate void WifiConnectionStateEventHandler(object sender, EventArgs args);
-    public delegate void ServerConnectionOpenedHandler(object sender, WifiSocket socket);
-
     public class Esp8266WifiDevice : IWifiAdapter, IDisposable
     {
         // The amount of time that we will search for 'OK' in response to joining an AP
@@ -55,11 +50,18 @@ namespace PervasiveDigital.Hardware.ESP8266
         public const string SessionStartCommand = "AT+CIPSTART=";
         public const string SessionEndCommand = "AT+CIPCLOSE=";
         public const string ServerCommand = "AT+CIPSERVER=";
+        public const string UpdateCommand = "AT+CIUPDATE";
         public const string LinkedReply = "Linked";
         public const string SendCommand = "AT+CIPSEND=";
         public const string SendCommandReply = "SEND OK";
         public const string ConnectReply = "CONNECT";
         public const string ErrorReply = "ERROR";
+
+        public delegate void WifiBootedEventHandler(object sender, EventArgs args);
+        public delegate void WifiErrorEventHandler(object sender, EventArgs args);
+        public delegate void WifiConnectionStateEventHandler(object sender, EventArgs args);
+        public delegate void ServerConnectionOpenedHandler(object sender, WifiSocket socket);
+        public delegate void ProgressCallback(string progress);
 
         private readonly ManualResetEvent _isInitializedEvent = new ManualResetEvent(false);
         private readonly WifiSocket[] _sockets = new WifiSocket[4];
@@ -158,6 +160,40 @@ namespace PervasiveDigital.Hardware.ESP8266
                             throw;
                     }
                 }
+                BackgroundInitialize(null);
+            }
+        }
+
+        /// <summary>
+        /// Perform an over-the-air update.  You must bridge ESP8266 GPIO0 to ground (after boot-up and before calling this fn).
+        /// You also need at least 8Mb of memory on your ESP8266.
+        /// </summary>
+        /// <param name="callback"></param>
+        public void Update(ProgressCallback callback)
+        {
+            EnsureInitialized();
+            lock(_oplock)
+            {
+                _esp.SendCommand(UpdateCommand);
+                while (true)
+                {
+                    // Use a very long timeout - this can take a while - currently, a five minute timeout, 
+                    //   but you really don't want to time-out this call and maybe cause the user to do 
+                    //   something silly like power down the chip while it is updating.
+                    var reply = _esp.GetReplyWithTimeout(300000);
+                    if (reply == OK)
+                        break;
+                    else
+                    {
+                        if (callback!=null)
+                            callback(reply);
+                        if (reply == ErrorReply)
+                        {
+                            throw new ErrorException(UpdateCommand);
+                        }
+                    }
+                }
+                Reset(false);
                 BackgroundInitialize(null);
             }
         }
@@ -453,14 +489,21 @@ namespace PervasiveDigital.Hardware.ESP8266
                 do
                 {
                     success = true;
-                    reply =
-                        _esp.SendCommandAndReadReply(SessionStartCommand + socket + ',' +
+                    var command = SessionStartCommand + socket + ',' +
                                                      (sock.UseTcp ? "\"TCP\",\"" : "\"UDP\",\"") + sock.Hostname + "\"," +
-                                                     sock.Port);
+                                                     sock.Port;
+                    reply = _esp.SendCommandAndReadReply(command);
                     if (reply.ToLower().IndexOf("dns fail") != -1)
+                    {
                         success = false; // a retriable failure
+                    }
                     else if (reply.IndexOf(ConnectReply) == -1) // Some other unexpected response
-                        throw new FailedExpectException(SessionStartCommand, ConnectReply, reply);
+                    {
+                        if (reply.IndexOf(ErrorReply) == 0)
+                            throw new ErrorException(command);
+                        else
+                            throw new FailedExpectException(SessionStartCommand, ConnectReply, reply);
+                    }
                     if (!success)
                         Thread.Sleep(500);
                 } while (--retries > 0 && !success);
@@ -511,7 +554,20 @@ namespace PervasiveDigital.Hardware.ESP8266
 
         public void SetPower(bool state)
         {
-            _powerPin.Write(state);
+            if (_powerPin == null)
+                return;
+
+            lock (_oplock)
+            {
+                _powerPin.Write(state);
+                // if the power just came back on, we need to re-init
+                if (state)
+                {
+                    Thread.Sleep(500);
+                    _isInitializedEvent.Reset();
+                    BackgroundInitialize(null);
+                }
+            }
         }
 
         public IPAddress StationIPAddress
@@ -576,8 +632,6 @@ namespace PervasiveDigital.Hardware.ESP8266
             get { return _apNetmask; }
         }
 
-
-        public ManualResetEvent IsInitializedEvent { get { return _isInitializedEvent; } }
 
         public string[] Version { get; private set; }
 
@@ -744,7 +798,8 @@ namespace PervasiveDigital.Hardware.ESP8266
                         if (_powerPin!=null && !_powerPin.Read())
                         {
                             Thread.Sleep(2000);
-                            SetPower(true);
+                            // Don't use SetPower - it will trigger a recursion into BackgroundInitialize
+                            _powerPin.Write(true);
                             Thread.Sleep(2000);
                         }
 
@@ -768,7 +823,8 @@ namespace PervasiveDigital.Hardware.ESP8266
                         // if after 10 retries, we're getting nowhere, then cycle the power
                         if (pingSuccess)
                             break;
-                        SetPower(false);
+                        if (_powerPin!=null)
+                            _powerPin.Write(false);
                     }
 
                     success = false;

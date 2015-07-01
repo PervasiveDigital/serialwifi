@@ -76,7 +76,7 @@ namespace SimpleHttpTest
 
             wifi.CreateServer(80, OnServerConnectionOpened);
 
-            var httpClient = new HttpClient(wifi, "www.example.com");
+            var httpClient = new HttpClient(wifi);
             var request = new HttpRequest(new Uri("http://www.example.com/"));
             request.ResponseReceived += HttpResponseReceived;
             httpClient.SendAsync(request);

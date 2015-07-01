@@ -64,7 +64,7 @@ namespace PervasiveDigital.Net.Azure.MobileService
             this.authenticationToken = authenticationToken;
             
             // create HTTP client and assign send/receive body callbacks
-            this.httpClient = new HttpClient(adapter, applicationUri.Host, applicationUri.Port);
+            this.httpClient = new HttpClient(adapter);
 
             // create HTTP request
             this.httpRequest = new HttpRequest();

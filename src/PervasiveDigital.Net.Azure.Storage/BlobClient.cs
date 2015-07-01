@@ -20,7 +20,7 @@ namespace PervasiveDigital.Net.Azure.Storage
         {
             _adapter = adapter;
             _account = account;
-            _client = new HttpClient(adapter, new Uri((string)account.UriEndpoints["Blob"]).Host);
+            _client = new HttpClient(adapter);
         }
 
         //public bool PutBlockBlob(string containerName, string blobName, string fileNamePath)

@@ -38,10 +38,27 @@ namespace PervasiveDigital.Hardware.ESP8266
         public CommandTimeoutException()
             : base("Timed out while waiting for a response from the device")
         {
-            
+
         }
 
         public CommandTimeoutException(string command)
+        {
+            this.Command = command;
+        }
+
+        public string Command { get; private set; }
+    }
+
+    public class ErrorException : Exception
+    {
+        public ErrorException()
+            : base("The wifi device returned ERROR in response to a command")
+        {
+            this.Command = null;
+        }
+
+        public ErrorException(string command)
+            : base("The wifi device returned ERROR in response to the '" + command + "' command")
         {
             this.Command = command;
         }

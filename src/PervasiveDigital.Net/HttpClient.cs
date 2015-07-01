@@ -14,19 +14,9 @@ namespace PervasiveDigital.Net
         private HttpResponse _lastResponse;
         private AutoResetEvent _requestCompletedEvent = new AutoResetEvent(false);
 
-        public HttpClient(INetworkAdapter adapter) : this(adapter, null, 80)
-        {
-        }
-
-        public HttpClient(INetworkAdapter adapter, string host) : this(adapter, host, 80)
-        {
-        }
-
-        public HttpClient(INetworkAdapter adapter, string host, int port)
+        public HttpClient(INetworkAdapter adapter)
         {
             _adapter = adapter;
-            this.Host = host;
-            this.Port = port;
         }
 
         public void Dispose()
@@ -34,13 +24,9 @@ namespace PervasiveDigital.Net
             if (_socket != null)
             {
                 _socket.Dispose();
-                _socket = null;                
+                _socket = null;
             }
         }
-
-        public string Host { get; private set; }
-
-        public int Port { get; private set; }
 
         public HttpResponse Send(HttpRequest req)
         {
@@ -50,19 +36,27 @@ namespace PervasiveDigital.Net
             _activeRequest = req;
             _requestCompletedEvent.Reset();
 
-            EnsureSocketOpen();
+            using (var socket = GetSocket(req.Uri.Host, req.Uri.Port))
+            {
+                try
+                {
+                    StringBuilder buffer = new StringBuilder();
 
-            StringBuilder buffer = new StringBuilder();
+                    req.AppendMethod(buffer);
+                    req.AppendHeaders(buffer);
 
-            req.AppendMethod(buffer);
-            req.AppendHeaders(buffer);
+                    socket.Send(buffer.ToString());
+                    if (req.Body != null && req.Body.Length > 0)
+                        socket.Send(req.Body);
 
-            _socket.Send(buffer.ToString());
-            if (req.Body!=null && req.Body.Length>0)
-                _socket.Send(req.Body);
-
-            _requestCompletedEvent.WaitOne();
-
+                    _requestCompletedEvent.WaitOne();
+                }
+                finally
+                {
+                    socket.SocketClosed -= SocketOnSocketClosed;
+                    socket.DataReceived -= SocketOnDataReceived;
+                }
+            }
             return _lastResponse;
         }
 
@@ -70,9 +64,10 @@ namespace PervasiveDigital.Net
         {
             if (_activeRequest != null)
                 throw new InvalidOperationException("A request is already outstanding");
+
             _activeRequest = req;
 
-            EnsureSocketOpen();
+            _socket = GetSocket(req.Uri.Host, req.Uri.Port);
 
             StringBuilder buffer = new StringBuilder();
 
@@ -84,23 +79,12 @@ namespace PervasiveDigital.Net
                 _socket.Send(req.Body);
         }
 
-        private void EnsureSocketOpen()
+        private ISocket GetSocket(string host, int port)
         {
-            try
-            {
-                if (_socket != null)
-                    _socket.Open();
-            }
-            catch (Exception)
-            {
-                _socket = null;
-            }
-            if (_socket == null)
-            {
-                _socket = _adapter.OpenSocket(this.Host, this.Port, true);
-                _socket.SocketClosed += SocketOnSocketClosed;
-                _socket.DataReceived += SocketOnDataReceived;
-            }
+            var socket = _adapter.OpenSocket(host, port, true);
+            socket.SocketClosed += SocketOnSocketClosed;
+            socket.DataReceived += SocketOnDataReceived;
+            return socket;
         }
 
         private void SocketOnDataReceived(object sender, SocketReceivedDataEventArgs args)
@@ -108,17 +92,27 @@ namespace PervasiveDigital.Net
             if (_activeRequest == null)
                 return;
 
+            ISocket socket = (ISocket)sender;
+
             if (_activeRequest.OnResponseReceived(args))
             {
                 _lastResponse = _activeRequest.Response;
                 _activeRequest = null;
+                // If this was an async send, we saved a ref to the socket.  Clean that up now.
+                if (_socket!=null && _socket == socket)
+                {
+                    _socket.SocketClosed -= SocketOnSocketClosed;
+                    _socket.DataReceived -= SocketOnDataReceived;
+                    _socket.Dispose();
+                    _socket = null;
+                }
                 _requestCompletedEvent.Set();
             }
         }
 
         private void SocketOnSocketClosed(object sender, EventArgs args)
         {
-            // Nothing really to do here
+            // nothing to do here, for now
         }
     }
 }
