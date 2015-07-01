@@ -635,6 +635,51 @@ namespace PervasiveDigital.Hardware.ESP8266
 
         public string[] Version { get; private set; }
 
+        public string AtProtocolVersion
+        {
+            get
+            {
+                foreach (var line in this.Version)
+                {
+                    if (line.StartsWith("AT version:"))
+                    {
+                        return line.Substring(line.IndexOf(':'));
+                    }
+                }
+                return null;
+            }
+        }
+
+        public string SdkVersion
+        {
+            get
+            {
+                foreach (var line in this.Version)
+                {
+                    if (line.StartsWith("SDK version:"))
+                    {
+                        return line.Substring(line.IndexOf(':'));
+                    }
+                }
+                return null;
+            }
+        }
+
+        public string CompileTime
+        {
+            get
+            {
+                foreach (var line in this.Version)
+                {
+                    if (line.StartsWith("compile time:"))
+                    {
+                        return line.Substring(line.IndexOf(':'));
+                    }
+                }
+                return null;
+            }
+        }
+
         public string StationMacAddress
         {
             get

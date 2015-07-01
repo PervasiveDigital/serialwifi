@@ -3,7 +3,7 @@
   <metadata>
     <id>PervasiveDigital.Security.ManagedProviders</id>
     <title>Managed implementations of selected security functions</title>
-    <version>2.0.1-beta</version>
+    <version>2.0.3</version>
     <authors>Martin Calsyn</authors>
     <owners>Pervasive Digital LLC</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
@@ -25,7 +25,7 @@
       <frameworkAssembly assemblyName="Microsoft.SPOT.Hardware" />
     </frameworkAssemblies>-->
     <dependencies>
-      <dependency id="PervasiveDigital.Utility" version="2.0.1-beta" />
+      <dependency id="PervasiveDigital.Utility" version="2.0.3" />
     </dependencies>
   </metadata>
 </package>
