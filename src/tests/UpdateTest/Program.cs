@@ -26,7 +26,7 @@ namespace UpdateTest
             //wifi.EnableVerboseOutput = true;
 
             wifi.Mode = OperatingMode.Station;
-            wifi.Connect("CloudGate", "Escal8shun");
+            wifi.Connect("XXX", "XXX");
 
             Debug.Print("Version before update : ");
             foreach (var line in wifi.Version)
