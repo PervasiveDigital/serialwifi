@@ -39,9 +39,9 @@
     <Reference Include="Microsoft.SPOT.Time" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PervasiveDigital.Utility\PervasiveDigital.Utility.csproj">
+    <ProjectReference Include="..\PervasiveDigital.Utility\PervasiveDigital.Utility.netmf43.csproj">
       <Project>{55830EE2-9538-4D00-B62F-C53B4056E96D}</Project>
-      <Name>PervasiveDigital.Utility</Name>
+      <Name>PervasiveDigital.Utility.netmf43</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Condition="EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />

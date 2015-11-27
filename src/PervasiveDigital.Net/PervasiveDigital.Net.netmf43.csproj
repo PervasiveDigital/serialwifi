@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <AssemblyName>PervasiveDigital.Net</AssemblyName>
+    <OutputType>Library</OutputType>
+    <RootNamespace>PervasiveDigital.Net</RootNamespace>
+    <ProjectTypeGuids>{b69e3092-b931-443c-abe7-7e7b65f2a37f};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CB2A8B83-5CFB-4DBB-B794-35B3BB1C43A6}</ProjectGuid>
+    <TargetFrameworkVersion>v4.3</TargetFrameworkVersion>
+    <NetMfTargetsBaseDir Condition="'$(NetMfTargetsBaseDir)'==''">$(MSBuildExtensionsPath32)\Microsoft\.NET Micro Framework\</NetMfTargetsBaseDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE,MF_FRAMEWORK_VERSION_V4_3,MF_FRAMEWORK</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE,MF_FRAMEWORK_VERSION_V4_3,MF_FRAMEWORK</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="BasicHttpResponse.cs" />
+    <Compile Include="DefaultUriParser.cs" />
+    <Compile Include="HttpBase.cs" />
+    <Compile Include="HttpClient.cs" />
+    <Compile Include="HttpRequest.cs" />
+    <Compile Include="HttpResponse.cs" />
+    <Compile Include="HttpMethod.cs" />
+    <Compile Include="HttpStatusCode.cs" />
+    <Compile Include="INetworkAdapter.cs" />
+    <Compile Include="ISocket.cs" />
+    <Compile Include="IWifiAdapter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SntpClient.cs" />
+    <Compile Include="Uri.cs" />
+    <Compile Include="UriComponents.cs" />
+    <Compile Include="UriElements.cs" />
+    <Compile Include="UriFormat.cs" />
+    <Compile Include="UriFormatException.cs" />
+    <Compile Include="UriHelper.cs" />
+    <Compile Include="UriHostNameType.cs" />
+    <Compile Include="UriKind.cs" />
+    <Compile Include="UriParseComponents.cs" />
+    <Compile Include="UriParser.cs" />
+    <Compile Include="UriPartial.cs" />
+    <Compile Include="WebException.cs" />
+    <Compile Include="WebExceptionStatus.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.SPOT.Native" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PervasiveDigital.Utility\PervasiveDigital.Utility.netmf43.csproj">
+      <Project>{55830EE2-9538-4D00-B62F-C53B4056E96D}</Project>
+      <Name>PervasiveDigital.Utility.netmf43</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Condition="EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
+  <Import Condition="!EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>powershell -NoLogo -NonInteractive -Command .'$(SolutionDir)Scripts\SolutionPreBuild.ps1' -Verbose -nuspec:'$(SolutionDir)nuget\$(ProjectName).nuspec' -SolutionDir:'$(SolutionDir)' -ProjectDir:'$(ProjectDir)' -ProjectName:'$(ProjectName)' -TargetDir:'$(TargetDir)' -TargetFileName:'$(TargetFileName)' -ConfigurationName:'$(ConfigurationName)'</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>powershell -NoLogo -NonInteractive -Command .'$(SolutionDir)Scripts\SolutionPostBuild.ps1' -Verbose -NetMFVersion:43 -RepoDir:'\nugetrepo\' -nuspec:'$(SolutionDir)nuget\$(ProjectName).nuspec' -SolutionDir:'$(SolutionDir)' -ProjectDir:'$(ProjectDir)' -ProjectName:'$(ProjectName)' -TargetDir:'$(TargetDir)' -TargetFileName:'$(TargetFileName)' -ConfigurationName:'$(ConfigurationName)'</PostBuildEvent>
+  </PropertyGroup>
+</Project>

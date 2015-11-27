@@ -50,17 +50,17 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\PervasiveDigital.Hardware.ESP8266\PervasiveDigital.Hardware.ESP8266.csproj">
+    <ProjectReference Include="..\..\PervasiveDigital.Hardware.ESP8266\PervasiveDigital.Hardware.ESP8266.netmf43.csproj">
       <Project>{DA09F76E-1655-442D-A3AC-3892FA963677}</Project>
-      <Name>PervasiveDigital.Hardware.ESP8266</Name>
+      <Name>PervasiveDigital.Hardware.ESP8266.netmf43</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\PervasiveDigital.Net\PervasiveDigital.Net.csproj">
+    <ProjectReference Include="..\..\PervasiveDigital.Net\PervasiveDigital.Net.netmf43.csproj">
       <Project>{CB2A8B83-5CFB-4DBB-B794-35B3BB1C43A6}</Project>
-      <Name>PervasiveDigital.Net</Name>
+      <Name>PervasiveDigital.Net.netmf43</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\PervasiveDigital.Utility\PervasiveDigital.Utility.csproj">
+    <ProjectReference Include="..\..\PervasiveDigital.Utility\PervasiveDigital.Utility.netmf43.csproj">
       <Project>{55830EE2-9538-4D00-B62F-C53B4056E96D}</Project>
-      <Name>PervasiveDigital.Utility</Name>
+      <Name>PervasiveDigital.Utility.netmf43</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Condition="EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
