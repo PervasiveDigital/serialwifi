@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>9385b516-1c5e-47c0-b6f5-dafe5bf44f3b</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>PervasiveDigital.Hardware.ESP8266.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AccessPoint.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AccessPointClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Ecn.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Esp8266Serial.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Esp8266WifiDevice.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exceptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OperatingMode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WifiSocket.cs" />
+  </ItemGroup>
+</Project>

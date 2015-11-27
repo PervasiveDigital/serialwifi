@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>2a8e71e3-c27f-4e5d-b255-bdcdb1894492</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>PervasiveDigital.Security.ManagedProviders.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)HMACSHA256.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IHashAlgorithm.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Sha2.cs" />
+  </ItemGroup>
+</Project>

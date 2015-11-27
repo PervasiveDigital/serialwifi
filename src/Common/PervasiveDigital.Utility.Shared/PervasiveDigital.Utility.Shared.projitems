@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>4b23ceb3-f360-40b1-a624-33f4bb11d1b8</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>PervasiveDigital.Utility.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ArrayUtilities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CharUtilities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CircularBuffer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Conversion.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FormatException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StringExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StringUtilities.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ThreadPool.cs" />
+  </ItemGroup>
+</Project>

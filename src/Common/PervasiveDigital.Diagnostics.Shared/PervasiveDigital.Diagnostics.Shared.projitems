@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>37583001-3e11-4fd1-84a5-6438fef03436</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>PervasiveDigital.Diagnostics.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)DebugPrintListener.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ITraceListener.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Trace.cs" />
+  </ItemGroup>
+</Project>

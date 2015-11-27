@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>1acf7038-aa93-42c6-8bb7-f827268e59f6</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>PervasiveDigital.Net.Azure.Storage</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AzureStorageHttpHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BlobClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CloudStorageAccount.cs" />
+  </ItemGroup>
+</Project>

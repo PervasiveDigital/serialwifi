@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>fd548668-a4d8-4e9f-9fb0-505e66ca9a46</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>PervasiveDigital.Net</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)BasicHttpResponse.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DefaultUriParser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HttpBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HttpClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HttpMethod.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HttpRequest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HttpResponse.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HttpStatusCode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)INetworkAdapter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ISocket.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IWifiAdapter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SntpClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Uri.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UriComponents.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UriElements.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UriFormat.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UriFormatException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UriHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UriHostNameType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UriKind.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UriParseComponents.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UriParser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UriPartial.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WebException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WebExceptionStatus.cs" />
+  </ItemGroup>
+</Project>

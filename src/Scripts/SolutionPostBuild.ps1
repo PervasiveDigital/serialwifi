@@ -1,17 +1,21 @@
 [CmdletBinding()]
-param($RepoDir, $SolutionDir, $ProjectDir, $ProjectName, $TargetDir, $TargetFileName, $ConfigurationName, $nuspec, $NetMFVersion, [switch]$Disable)
+param($RepoDir, $SolutionDir, $ConfigurationName, [switch]$Disable)
 
-if(-not ($RepoDir -and $SolutionDir -and $ProjectDir -and $ProjectName -and $TargetDir -and $TargetFileName -and $ConfigurationName))
+if(-not ($RepoDir -and $SolutionDir -and $ConfigurationName))
 {
-	Write-Error "RepoDir, SolutionDir, ProjectDir, TargetDir, TargetFileName and ConfigurationName are all required"
+	Write-Error "RepoDir, SolutionDir, and ConfigurationName are all required"
 	exit 1
 }
 
-if ($nuspec)
-{
+$netmfVersions = "43","44"
+$projects = "PervasiveDigital.Diagnostics","PervasiveDigital.Hardware.ESP8266","PervasiveDigital.Net.Azure.MobileServices","PervasiveDigital.Net.Azure.Storage","PervasiveDigital.Net","PervasiveDigital.Security.ManagedProviders","PervasiveDigital.Utility"
+
+function PublishNugetPackage([string]$projectName, [string]$netmfVersion) {
+
+	$nuspec = $SolutionDir + 'nuget\' + $projectName + '.nuspec'
 	Write-Verbose "nuspec file $nuspec"
 
-	$nugetBuildDir = $SolutionDir + "nuget\" + $ConfigurationName + "\" + $ProjectName + "\"
+	$nugetBuildDir = $SolutionDir + 'nuget\' + $ConfigurationName + '\' + $projectName + '\'
 	$libDir = $nugetBuildDir + "lib\"
 	$srcDir = $nugetBuildDir + "src\"
 
@@ -22,23 +26,18 @@ if ($nuspec)
 	mkdir $libDir | out-null
 	mkdir $srcDir | out-null
 
-	if ($NetMFVersion)
-	{
-		mkdir $libDir"\netmf"$NetMFVersion"\be" | out-null
-		Copy-Item -Path $TargetDir"be\*" -Destination $libDir"\netmf"$NetMFVersion"\be" -Include "*.dll","*.pdb","*.xml","*.pdbx","*.pe"
-		mkdir $libDir"\netmf"$NetMFVersion"\le" | out-null
-		Copy-Item -Path $TargetDir"le\*" -Destination $libDir"\netmf"$NetMFVersion"\le" -Include "*.dll","*.pdb","*.xml","*.pdbx","*.pe"
-		Copy-Item -Path $TargetDir"*" -Destination $libDir"\netmf"$NetMFVersion -Include "*.dll","*.pdb","*.xml"
-	}
-	else
-	{
-		mkdir $libDir"\net40" | out-null
-		Copy-Item -Path $TargetDir"*" -Destination $libDir"\net40" -Include "*.dll","*.pdb","*.xml"
-	}
+	$projectDir = $SolutionDir + 'netmf' + $netmfVersion + '\' + $projectName + '\'
+	$targetDir = $projectDir + 'bin\' + $ConfigurationName + '\'
+
+	mkdir $libDir"\netmf"$netMFVersion"\be" | out-null
+	Copy-Item -Path $targetDir"be\*" -Destination $libDir"\netmf"$netMFVersion"\be" -Include "*.dll","*.pdb","*.xml","*.pdbx","*.pe"
+	mkdir $libDir"\netmf"$netMFVersion"\le" | out-null
+	Copy-Item -Path $targetDir"le\*" -Destination $libDir"\netmf"$netMFVersion"\le" -Include "*.dll","*.pdb","*.xml","*.pdbx","*.pe"
+	Copy-Item -Path $targetDir"*" -Destination $libDir"\netmf"$netMFVersion -Include "*.dll","*.pdb","*.xml"
 
 	# Copy source files for symbol server
-	Copy-Item -Recurse -Path $ProjectDir -Destination $srcDir -Filter "*.cs"
-	$target = $srcDir + $ProjectName
+	Copy-Item -Recurse -Path $projectDir -Destination $srcDir -Filter "*.cs"
+	$target = $srcDir + $projectName
 	if (test-path $target"\obj") { Remove-Item -Recurse $target"\obj" | out-null }
 	if (test-path $target"\bin") { Remove-Item -Recurse $target"\bin" | out-null }
 
@@ -48,4 +47,10 @@ if ($nuspec)
 
 	$args = 'pack', $nuspec, '-Symbols', '-basepath', $nugetBuildDir, '-OutputDirectory', $output
 	& $nuget $args
+}
+
+foreach ($project in $projects) {
+	foreach ($version in $netmfVersions) {
+		PublishNugetPackage $project $version
+	}
 }

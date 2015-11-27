@@ -198,3 +198,7 @@ FakesAssemblies/
 # netmf flash files
 *.OnBoardFlash.dat
 *.OnBoardFlash.dat.smd
+/src/netmf43/Tests/DiagnosticsTest/OnBoardFlash.dat.smd
+/src/netmf43/Tests/DiagnosticsTest/OnBoardFlash.dat
+/src/netmf43/Tests/SimpleHttpTest/OnBoardFlash.dat.smd
+/src/netmf43/Tests/SimpleHttpTest/OnBoardFlash.dat
