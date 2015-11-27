@@ -34,11 +34,17 @@
   <ItemGroup>
     <Reference Include="Microsoft.SPOT.Native" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PervasiveDigital.Utility\PervasiveDigital.Utility.netmf43.csproj">
+      <Project>{C8BD7C9D-9ECE-4E98-A2C3-0B0576538FF6}</Project>
+      <Name>PervasiveDigital.Utility.netmf43</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="..\..\Common\PervasiveDigital.Net.Shared\PervasiveDigital.Net.Shared.projitems" Label="Shared" />
   <Import Condition="EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <Import Condition="!EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>powershell -NoLogo -NonInteractive -Command .'$(SolutionDir)Scripts\SolutionPreBuild.ps1' -Verbose -nuspec:'$(SolutionDir)nuget\$(ProjectName).nuspec' -SolutionDir:'$(SolutionDir)' -ProjectDir:'$(ProjectDir)' -ProjectName:'$(ProjectName)' -TargetDir:'$(TargetDir)' -TargetFileName:'$(TargetFileName)' -ConfigurationName:'$(ConfigurationName)'</PreBuildEvent>
+    <PreBuildEvent>powershell -NoLogo -NonInteractive -Command .'$(SolutionDir)Scripts\SolutionPreBuild.ps1' -Verbose -SolutionDir:'$(SolutionDir)' -ProjectDir:'$(ProjectDir)' -ProjectName:'PervasiveDigital.Net'</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>

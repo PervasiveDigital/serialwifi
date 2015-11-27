@@ -32,7 +32,7 @@ namespace SimpleHttpTest
             // On Oxygen+Neon, you can use use new NeonWifiDevice() without providing a port or power pin definition
 
             // Enable echoing of commands
-            wifi.EnableDebugOutput = true;
+            wifi.EnableDebugOutput = false;
             // Enable dump of every byte sent or received (may introduce performance delays and can cause buffer overflow
             //   at low baud rates or with small serial buffers.
             //wifi.EnableVerboseOutput = true;
@@ -52,7 +52,7 @@ namespace SimpleHttpTest
 #else
             wifi.Mode = OperatingMode.Station;
 #endif
-            wifi.Connect("XXX", "XXX");
+            wifi.Connect("CloudGate", "Escal8shun");
 
             Debug.Print("Station IP address : " + wifi.StationIPAddress.ToString());
             Debug.Print("Station MAC address : " + wifi.StationMacAddress);

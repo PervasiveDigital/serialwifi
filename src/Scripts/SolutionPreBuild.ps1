@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param($SolutionDir, $ProjectDir, $ProjectName, $TargetDir, $TargetFileName, $ConfigurationName, $nuspec, [switch]$Disable)
+param($SolutionDir, $ProjectDir, $ProjectName, [switch]$Disable)
 
 # For reasons unknown, this is required when I build on Win10
 Get-Command Get-Content
@@ -8,9 +8,9 @@ Get-Command Get-Content
 # and then apply it to the assemblies
 $VersionRegex = "\d+\.\d+\.\d+(\.\d+)?(\.\w+)?"
 
-if(-not ($SolutionDir -and $ProjectDir -and $TargetDir -and $TargetFileName -and $ConfigurationName))
+if(-not ($SolutionDir -and $ProjectDir -and $ProjectName))
 {
-	Write-Error "SolutionDir, ProjectDir, TargetDir, TargetFileName and ConfigurationName are all required"
+	Write-Error "SolutionDir, ProjectDir, and ProjectName are all required"
 	exit 1
 }
 
@@ -18,6 +18,8 @@ if ($PSBoundParameters.ContainsKey('Disable'))
 {
 	Write-Verbose "Script disabled; no actions will be taken on the files."
 }
+
+$nuspec = $SolutionDir + 'nuget\' + $projectName + '.nuspec'
 
 # read the desired new version
 [xml] $doc = gc $SolutionDir"Version.xml"
