@@ -7,8 +7,8 @@
     <ProjectTypeGuids>{b69e3092-b931-443c-abe7-7e7b65f2a37f};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{95FCA797-76BC-4A56-B913-92EF6B22C6E8}</ProjectGuid>
-    <TargetFrameworkVersion>v4.3</TargetFrameworkVersion>
+    <ProjectGuid>{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E}</ProjectGuid>
+    <TargetFrameworkVersion>v4.4</TargetFrameworkVersion>
     <NetMfTargetsBaseDir Condition="'$(NetMfTargetsBaseDir)'==''">$(MSBuildExtensionsPath32)\Microsoft\.NET Micro Framework\</NetMfTargetsBaseDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -36,9 +36,9 @@
     <Reference Include="Microsoft.SPOT.Time" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PervasiveDigital.Utility\PervasiveDigital.Utility.netmf43.csproj">
-      <Project>{C8BD7C9D-9ECE-4E98-A2C3-0B0576538FF6}</Project>
-      <Name>PervasiveDigital.Utility.netmf43</Name>
+    <ProjectReference Include="..\PervasiveDigital.Utility.netmf44\PervasiveDigital.Utility.netmf44.csproj">
+      <Project>{9FDDB085-8ABE-40B7-9718-2396F3101B50}</Project>
+      <Name>PervasiveDigital.Utility.netmf44</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="..\..\Common\PervasiveDigital.Diagnostics.Shared\PervasiveDigital.Diagnostics.Shared.projitems" Label="Shared" />
@@ -46,9 +46,5 @@
   <Import Condition="!EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>powershell -NoLogo -NonInteractive -Command .'$(SolutionDir)Scripts\SolutionPreBuild.ps1' -Verbose -SolutionDir:'$(SolutionDir)' -ProjectDir:'$(ProjectDir)' -ProjectName:'PervasiveDigital.Diagnostics'</PreBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
   </PropertyGroup>
 </Project>

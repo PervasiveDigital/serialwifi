@@ -87,6 +87,10 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "PervasiveDigital.Net.Shared
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "PervasiveDigital.Net.Azure.Storage.Shared", "Common\PervasiveDigital.Net.Azure.Storage.Shared\PervasiveDigital.Net.Azure.Storage.Shared.shproj", "{1ACF7038-AA93-42C6-8BB7-F827268E59F6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PervasiveDigital.Diagnostics.netmf44", "netmf44\PervasiveDigital.Diagnostics.netmf44\PervasiveDigital.Diagnostics.netmf44.csproj", "{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PervasiveDigital.Utility.netmf44", "netmf44\PervasiveDigital.Utility.netmf44\PervasiveDigital.Utility.netmf44.csproj", "{9FDDB085-8ABE-40B7-9718-2396F3101B50}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Common\PervasiveDigital.Utility.Shared\PervasiveDigital.Utility.Shared.projitems*{4b23ceb3-f360-40b1-a624-33f4bb11d1b8}*SharedItemsImports = 13
@@ -95,6 +99,8 @@ Global
 		Common\PervasiveDigital.Net.Shared\PervasiveDigital.Net.Shared.projitems*{89957c1b-a0ef-487a-9c0b-2b33da57231e}*SharedItemsImports = 4
 		Common\PervasiveDigital.Net.Shared\PervasiveDigital.Net.Shared.projitems*{fd548668-a4d8-4e9f-9fb0-505e66ca9a46}*SharedItemsImports = 13
 		Common\PervasiveDigital.Security.ManagedProviders.Shared\PervasiveDigital.Security.ManagedProviders.Shared.projitems*{a5289ec5-d381-4937-abc5-5e9f41f4fdcc}*SharedItemsImports = 4
+		Common\PervasiveDigital.Diagnostics.Shared\PervasiveDigital.Diagnostics.Shared.projitems*{995e19dc-f7b9-4d81-ae6d-5b41415cfa5e}*SharedItemsImports = 4
+		Common\PervasiveDigital.Utility.Shared\PervasiveDigital.Utility.Shared.projitems*{9fddb085-8abe-40b7-9718-2396f3101b50}*SharedItemsImports = 4
 		Common\PervasiveDigital.Net.Azure.MobileServices.Shared\PervasiveDigital.Net.Azure.MobileServices.Shared.projitems*{c7ca334c-7db3-4b1e-83ee-864fe091195b}*SharedItemsImports = 4
 		Common\PervasiveDigital.Net.Azure.Storage.Shared\PervasiveDigital.Net.Azure.Storage.Shared.projitems*{1acf7038-aa93-42c6-8bb7-f827268e59f6}*SharedItemsImports = 13
 		Common\PervasiveDigital.Hardware.ESP8266.Shared\PervasiveDigital.Hardware.ESP8266.Shared.projitems*{9385b516-1c5e-47c0-b6f5-dafe5bf44f3b}*SharedItemsImports = 13
@@ -281,6 +287,30 @@ Global
 		{E4593F41-2C52-449D-BA30-762F067FEFD3}.Release|x64.Build.0 = Release|Any CPU
 		{E4593F41-2C52-449D-BA30-762F067FEFD3}.Release|x86.ActiveCfg = Release|Any CPU
 		{E4593F41-2C52-449D-BA30-762F067FEFD3}.Release|x86.Build.0 = Release|Any CPU
+		{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E}.Debug|x64.Build.0 = Debug|Any CPU
+		{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E}.Debug|x86.Build.0 = Debug|Any CPU
+		{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E}.Release|x64.ActiveCfg = Release|Any CPU
+		{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E}.Release|x64.Build.0 = Release|Any CPU
+		{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E}.Release|x86.ActiveCfg = Release|Any CPU
+		{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E}.Release|x86.Build.0 = Release|Any CPU
+		{9FDDB085-8ABE-40B7-9718-2396F3101B50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FDDB085-8ABE-40B7-9718-2396F3101B50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FDDB085-8ABE-40B7-9718-2396F3101B50}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9FDDB085-8ABE-40B7-9718-2396F3101B50}.Debug|x64.Build.0 = Debug|Any CPU
+		{9FDDB085-8ABE-40B7-9718-2396F3101B50}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9FDDB085-8ABE-40B7-9718-2396F3101B50}.Debug|x86.Build.0 = Debug|Any CPU
+		{9FDDB085-8ABE-40B7-9718-2396F3101B50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FDDB085-8ABE-40B7-9718-2396F3101B50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FDDB085-8ABE-40B7-9718-2396F3101B50}.Release|x64.ActiveCfg = Release|Any CPU
+		{9FDDB085-8ABE-40B7-9718-2396F3101B50}.Release|x64.Build.0 = Release|Any CPU
+		{9FDDB085-8ABE-40B7-9718-2396F3101B50}.Release|x86.ActiveCfg = Release|Any CPU
+		{9FDDB085-8ABE-40B7-9718-2396F3101B50}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -309,5 +339,7 @@ Global
 		{2A8E71E3-C27F-4E5D-B255-BDCDB1894492} = {B33BAB01-0854-4D5A-9B90-E4FC1156CFDA}
 		{FD548668-A4D8-4E9F-9FB0-505E66CA9A46} = {B33BAB01-0854-4D5A-9B90-E4FC1156CFDA}
 		{1ACF7038-AA93-42C6-8BB7-F827268E59F6} = {B33BAB01-0854-4D5A-9B90-E4FC1156CFDA}
+		{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E} = {3190C22A-CF74-4608-8258-E57578589088}
+		{9FDDB085-8ABE-40B7-9718-2396F3101B50} = {3190C22A-CF74-4608-8258-E57578589088}
 	EndGlobalSection
 EndGlobal
