@@ -52,7 +52,7 @@ namespace SimpleHttpTest
 #else
             wifi.Mode = OperatingMode.Station;
 #endif
-            wifi.Connect("CloudGate", "Escal8shun");
+            wifi.Connect("XXX", "XXX");
 
             Debug.Print("Station IP address : " + wifi.StationIPAddress.ToString());
             Debug.Print("Station MAC address : " + wifi.StationMacAddress);

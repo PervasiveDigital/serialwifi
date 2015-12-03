@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <AssemblyName>PervasiveDigital.Net.Azure.Storage</AssemblyName>
+    <OutputType>Library</OutputType>
+    <RootNamespace>PervasiveDigital.Net.Azure.Storage</RootNamespace>
+    <ProjectTypeGuids>{b69e3092-b931-443c-abe7-7e7b65f2a37f};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2A160B94-894D-4FB2-AC91-0A661B7487BA}</ProjectGuid>
+    <TargetFrameworkVersion>v4.4</TargetFrameworkVersion>
+    <NetMfTargetsBaseDir Condition="'$(NetMfTargetsBaseDir)'==''">$(MSBuildExtensionsPath32)\Microsoft\.NET Micro Framework\</NetMfTargetsBaseDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.SPOT.Native" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PervasiveDigital.Net\PervasiveDigital.Net.netmf44.csproj">
+      <Project>{D0CF87C0-73B7-4E66-AE4C-D8A27C206F89}</Project>
+      <Name>PervasiveDigital.Net.netmf44</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PervasiveDigital.Security.ManagedProviders\PervasiveDigital.Security.ManagedProviders.netmf44.csproj">
+      <Project>{B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF}</Project>
+      <Name>PervasiveDigital.Security.ManagedProviders.netmf44</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PervasiveDigital.Utility\PervasiveDigital.Utility.netmf44.csproj">
+      <Project>{9FDDB085-8ABE-40B7-9718-2396F3101B50}</Project>
+      <Name>PervasiveDigital.Utility.netmf44</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="..\..\Common\PervasiveDigital.Net.Azure.Storage.Shared\PervasiveDigital.Net.Azure.Storage.Shared.projitems" Label="Shared" />
+  <Import Condition="EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
+  <Import Condition="!EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>powershell -NoLogo -NonInteractive -Command .'$(SolutionDir)Scripts\SolutionPreBuild.ps1' -Verbose -SolutionDir:'$(SolutionDir)' -ProjectDir:'$(ProjectDir)' -ProjectName:'PervasiveDigital.Net.Azure.Storage'</PreBuildEvent>
+  </PropertyGroup>
+</Project>

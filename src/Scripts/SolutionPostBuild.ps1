@@ -10,10 +10,9 @@ if(-not ($RepoDir -and $SolutionDir -and $ConfigurationName))
 $netmfVersions = "43","44"
 $projects = "PervasiveDigital.Diagnostics","PervasiveDigital.Hardware.ESP8266","PervasiveDigital.Net.Azure.MobileServices","PervasiveDigital.Net.Azure.Storage","PervasiveDigital.Net","PervasiveDigital.Security.ManagedProviders","PervasiveDigital.Utility"
 
-function PublishNugetPackage([string]$projectName, [string]$netmfVersion) {
+function CleanNugetPackage([string]$projectName) {
 
-	$nuspec = $SolutionDir + 'nuget\' + $projectName + '.nuspec'
-	Write-Verbose "nuspec file $nuspec"
+	Write-Verbose "CLEAN"
 
 	$nugetBuildDir = $SolutionDir + 'nuget\' + $ConfigurationName + '\' + $projectName + '\'
 	$libDir = $nugetBuildDir + "lib\"
@@ -25,21 +24,60 @@ function PublishNugetPackage([string]$projectName, [string]$netmfVersion) {
 	if (test-path $nugetBuildDir) { ri -r -fo $nugetBuildDir }
 	mkdir $libDir | out-null
 	mkdir $srcDir | out-null
+}
+
+
+function CopySource([string]$projectName) {
+
+	Write-Verbose "COPYSOURCE"
+
+	$nugetBuildDir = $SolutionDir + 'nuget\' + $ConfigurationName + '\' + $projectName + '\'
+	$srcDir = $nugetBuildDir + "src\"
+
+	# Copy source files for symbol server
+	$sharedProjectName = $projectName + '.Shared\'
+	$sharedDir = $SolutionDir + 'common\' + $sharedProjectName
+	Copy-Item -Recurse -Path $sharedDir -Destination $srcDir -Filter "*.cs"
+	
+	# rename the copied dir to remove the .Shared
+	$sharedTargetPath = $srcDir + $sharedProjectName
+	Rename-Item -Path $sharedTargetPath -NewName $projectName
+
+	# no longer needed since there are no generated files in shared source projects
+	#$target = $srcDir + $projectName
+	#if (test-path $target"\obj") { Remove-Item -Recurse $target"\obj" | out-null }
+	#if (test-path $target"\bin") { Remove-Item -Recurse $target"\bin" | out-null }
+}
+
+function PrepareNugetPackage([string]$projectName, [string]$netmfVersion) {
+
+	Write-Verbose "PREPARE"
+
+	$nugetBuildDir = $SolutionDir + 'nuget\' + $ConfigurationName + '\' + $projectName + '\'
+	$libDir = $nugetBuildDir + "lib\"
+	$srcDir = $nugetBuildDir + "src\"
 
 	$projectDir = $SolutionDir + 'netmf' + $netmfVersion + '\' + $projectName + '\'
 	$targetDir = $projectDir + 'bin\' + $ConfigurationName + '\'
 
 	mkdir $libDir"\netmf"$netMFVersion"\be" | out-null
-	Copy-Item -Path $targetDir"be\*" -Destination $libDir"\netmf"$netMFVersion"\be" -Include "*.dll","*.pdb","*.xml","*.pdbx","*.pe"
+	Copy-Item -Path $targetDir"be\*" -Destination $libDir"\netmf"$netMFVersion"\be" -Include "$projectname.dll","$projectname.pdb","$projectname.xml","$projectname.pdbx","$projectname.pe"
 	mkdir $libDir"\netmf"$netMFVersion"\le" | out-null
-	Copy-Item -Path $targetDir"le\*" -Destination $libDir"\netmf"$netMFVersion"\le" -Include "*.dll","*.pdb","*.xml","*.pdbx","*.pe"
-	Copy-Item -Path $targetDir"*" -Destination $libDir"\netmf"$netMFVersion -Include "*.dll","*.pdb","*.xml"
+	Copy-Item -Path $targetDir"le\*" -Destination $libDir"\netmf"$netMFVersion"\le" -Include "$projectname.dll","$projectname.pdb","$projectname.xml","$projectname.pdbx","$projectname.pe"
+	Copy-Item -Path $targetDir"*" -Destination $libDir"\netmf"$netMFVersion -Include "$projectname.dll","$projectname.pdb","$projectname.xml","$projectname.pdbx","$projectname.pe"
+}
 
-	# Copy source files for symbol server
-	Copy-Item -Recurse -Path $projectDir -Destination $srcDir -Filter "*.cs"
-	$target = $srcDir + $projectName
-	if (test-path $target"\obj") { Remove-Item -Recurse $target"\obj" | out-null }
-	if (test-path $target"\bin") { Remove-Item -Recurse $target"\bin" | out-null }
+function PublishNugetPackage([string]$projectName) {
+
+	Write-Verbose "PUBLISH"
+
+	$nuspec = $SolutionDir + 'nuget\' + $projectName + '.nuspec'
+	Write-Verbose "nuspec file $nuspec"
+
+	$nugetBuildDir = $SolutionDir + 'nuget\' + $ConfigurationName + '\' + $projectName + '\'
+	$libDir = $nugetBuildDir + "lib\"
+	$srcDir = $nugetBuildDir + "src\"
+	$nuget = $SolutionDir + ".nuget\nuget.exe"
 
 	# Create the nuget package
 	$output = $repoDir + $ConfigurationName
@@ -50,7 +88,10 @@ function PublishNugetPackage([string]$projectName, [string]$netmfVersion) {
 }
 
 foreach ($project in $projects) {
+	CleanNugetPackage $project
+	CopySource $project
 	foreach ($version in $netmfVersions) {
-		PublishNugetPackage $project $version
+		PrepareNugetPackage  $project $version
 	}
+	PublishNugetPackage $project
 }

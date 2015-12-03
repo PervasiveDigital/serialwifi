@@ -64,13 +64,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiagnosticsTest.netmf43", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildNugetPackages", "BuildNugetPackages\BuildNugetPackages.csproj", "{E4593F41-2C52-449D-BA30-762F067FEFD3}"
 	ProjectSection(ProjectDependencies) = postProject
+		{12E19B00-49AB-49CC-AC36-A534D61D65F2} = {12E19B00-49AB-49CC-AC36-A534D61D65F2}
 		{89957C1B-A0EF-487A-9C0B-2B33DA57231E} = {89957C1B-A0EF-487A-9C0B-2B33DA57231E}
 		{ADFB7B3A-EBA1-48CB-A896-A92AF20389C0} = {ADFB7B3A-EBA1-48CB-A896-A92AF20389C0}
 		{C7CA334C-7DB3-4B1E-83EE-864FE091195B} = {C7CA334C-7DB3-4B1E-83EE-864FE091195B}
+		{9FDDB085-8ABE-40B7-9718-2396F3101B50} = {9FDDB085-8ABE-40B7-9718-2396F3101B50}
+		{2A160B94-894D-4FB2-AC91-0A661B7487BA} = {2A160B94-894D-4FB2-AC91-0A661B7487BA}
 		{95FCA797-76BC-4A56-B913-92EF6B22C6E8} = {95FCA797-76BC-4A56-B913-92EF6B22C6E8}
 		{C8BD7C9D-9ECE-4E98-A2C3-0B0576538FF6} = {C8BD7C9D-9ECE-4E98-A2C3-0B0576538FF6}
+		{6F714FA5-1DDC-473F-95CE-7DFB45E8E182} = {6F714FA5-1DDC-473F-95CE-7DFB45E8E182}
 		{6ACF69A5-42F6-415D-A2E0-E50107F75D4C} = {6ACF69A5-42F6-415D-A2E0-E50107F75D4C}
+		{B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF} = {B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF}
+		{D0CF87C0-73B7-4E66-AE4C-D8A27C206F89} = {D0CF87C0-73B7-4E66-AE4C-D8A27C206F89}
 		{A5289EC5-D381-4937-ABC5-5E9F41F4FDCC} = {A5289EC5-D381-4937-ABC5-5E9F41F4FDCC}
+		{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E} = {995E19DC-F7B9-4D81-AE6D-5B41415CFA5E}
 	EndProjectSection
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "PervasiveDigital.Diagnostics.Shared", "Common\PervasiveDigital.Diagnostics.Shared\PervasiveDigital.Diagnostics.Shared.shproj", "{37583001-3E11-4FD1-84A5-6438FEF03436}"
@@ -87,17 +94,31 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "PervasiveDigital.Net.Shared
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "PervasiveDigital.Net.Azure.Storage.Shared", "Common\PervasiveDigital.Net.Azure.Storage.Shared\PervasiveDigital.Net.Azure.Storage.Shared.shproj", "{1ACF7038-AA93-42C6-8BB7-F827268E59F6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PervasiveDigital.Diagnostics.netmf44", "netmf44\PervasiveDigital.Diagnostics.netmf44\PervasiveDigital.Diagnostics.netmf44.csproj", "{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PervasiveDigital.Diagnostics.netmf44", "netmf44\PervasiveDigital.Diagnostics\PervasiveDigital.Diagnostics.netmf44.csproj", "{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PervasiveDigital.Utility.netmf44", "netmf44\PervasiveDigital.Utility.netmf44\PervasiveDigital.Utility.netmf44.csproj", "{9FDDB085-8ABE-40B7-9718-2396F3101B50}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PervasiveDigital.Utility.netmf44", "netmf44\PervasiveDigital.Utility\PervasiveDigital.Utility.netmf44.csproj", "{9FDDB085-8ABE-40B7-9718-2396F3101B50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PervasiveDigital.Net.netmf44", "netmf44\PervasiveDigital.Net\PervasiveDigital.Net.netmf44.csproj", "{D0CF87C0-73B7-4E66-AE4C-D8A27C206F89}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PervasiveDigital.Hardware.ESP8266.netmf44", "netmf44\PervasiveDigital.Hardware.ESP8266\PervasiveDigital.Hardware.ESP8266.netmf44.csproj", "{12E19B00-49AB-49CC-AC36-A534D61D65F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PervasiveDigital.Security.ManagedProviders.netmf44", "netmf44\PervasiveDigital.Security.ManagedProviders\PervasiveDigital.Security.ManagedProviders.netmf44.csproj", "{B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PervasiveDigital.Net.Azure.Storage.netmf44", "netmf44\PervasiveDigital.Net.Azure.Storage\PervasiveDigital.Net.Azure.Storage.netmf44.csproj", "{2A160B94-894D-4FB2-AC91-0A661B7487BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PervasiveDigital.Net.Azure.MobileServices.netmf44", "netmf44\PervasiveDigital.Net.Azure.MobileServices\PervasiveDigital.Net.Azure.MobileServices.netmf44.csproj", "{6F714FA5-1DDC-473F-95CE-7DFB45E8E182}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Common\PervasiveDigital.Utility.Shared\PervasiveDigital.Utility.Shared.projitems*{4b23ceb3-f360-40b1-a624-33f4bb11d1b8}*SharedItemsImports = 13
+		Common\PervasiveDigital.Security.ManagedProviders.Shared\PervasiveDigital.Security.ManagedProviders.Shared.projitems*{b1b0edbe-2ed4-4fb7-8e43-047a32fd64cf}*SharedItemsImports = 4
+		Common\PervasiveDigital.Net.Azure.Storage.Shared\PervasiveDigital.Net.Azure.Storage.Shared.projitems*{2a160b94-894d-4fb2-ac91-0a661b7487ba}*SharedItemsImports = 4
 		Common\PervasiveDigital.Hardware.ESP8266.Shared\PervasiveDigital.Hardware.ESP8266.Shared.projitems*{6acf69a5-42f6-415d-a2e0-e50107f75d4c}*SharedItemsImports = 4
 		Common\PervasiveDigital.Net.Azure.Storage.Shared\PervasiveDigital.Net.Azure.Storage.Shared.projitems*{adfb7b3a-eba1-48cb-a896-a92af20389c0}*SharedItemsImports = 4
+		Common\PervasiveDigital.Hardware.ESP8266.Shared\PervasiveDigital.Hardware.ESP8266.Shared.projitems*{12e19b00-49ab-49cc-ac36-a534d61d65f2}*SharedItemsImports = 4
 		Common\PervasiveDigital.Net.Shared\PervasiveDigital.Net.Shared.projitems*{89957c1b-a0ef-487a-9c0b-2b33da57231e}*SharedItemsImports = 4
 		Common\PervasiveDigital.Net.Shared\PervasiveDigital.Net.Shared.projitems*{fd548668-a4d8-4e9f-9fb0-505e66ca9a46}*SharedItemsImports = 13
+		Common\PervasiveDigital.Net.Azure.MobileServices.Shared\PervasiveDigital.Net.Azure.MobileServices.Shared.projitems*{6f714fa5-1ddc-473f-95ce-7dfb45e8e182}*SharedItemsImports = 4
 		Common\PervasiveDigital.Security.ManagedProviders.Shared\PervasiveDigital.Security.ManagedProviders.Shared.projitems*{a5289ec5-d381-4937-abc5-5e9f41f4fdcc}*SharedItemsImports = 4
 		Common\PervasiveDigital.Diagnostics.Shared\PervasiveDigital.Diagnostics.Shared.projitems*{995e19dc-f7b9-4d81-ae6d-5b41415cfa5e}*SharedItemsImports = 4
 		Common\PervasiveDigital.Utility.Shared\PervasiveDigital.Utility.Shared.projitems*{9fddb085-8abe-40b7-9718-2396f3101b50}*SharedItemsImports = 4
@@ -109,6 +130,7 @@ Global
 		Common\PervasiveDigital.Utility.Shared\PervasiveDigital.Utility.Shared.projitems*{c8bd7c9d-9ece-4e98-a2c3-0b0576538ff6}*SharedItemsImports = 4
 		Common\PervasiveDigital.Diagnostics.Shared\PervasiveDigital.Diagnostics.Shared.projitems*{37583001-3e11-4fd1-84a5-6438fef03436}*SharedItemsImports = 13
 		Common\PervasiveDigital.Diagnostics.Shared\PervasiveDigital.Diagnostics.Shared.projitems*{95fca797-76bc-4a56-b913-92ef6b22c6e8}*SharedItemsImports = 4
+		Common\PervasiveDigital.Net.Shared\PervasiveDigital.Net.Shared.projitems*{d0cf87c0-73b7-4e66-ae4c-d8a27c206f89}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -311,6 +333,66 @@ Global
 		{9FDDB085-8ABE-40B7-9718-2396F3101B50}.Release|x64.Build.0 = Release|Any CPU
 		{9FDDB085-8ABE-40B7-9718-2396F3101B50}.Release|x86.ActiveCfg = Release|Any CPU
 		{9FDDB085-8ABE-40B7-9718-2396F3101B50}.Release|x86.Build.0 = Release|Any CPU
+		{D0CF87C0-73B7-4E66-AE4C-D8A27C206F89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0CF87C0-73B7-4E66-AE4C-D8A27C206F89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0CF87C0-73B7-4E66-AE4C-D8A27C206F89}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D0CF87C0-73B7-4E66-AE4C-D8A27C206F89}.Debug|x64.Build.0 = Debug|Any CPU
+		{D0CF87C0-73B7-4E66-AE4C-D8A27C206F89}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D0CF87C0-73B7-4E66-AE4C-D8A27C206F89}.Debug|x86.Build.0 = Debug|Any CPU
+		{D0CF87C0-73B7-4E66-AE4C-D8A27C206F89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0CF87C0-73B7-4E66-AE4C-D8A27C206F89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0CF87C0-73B7-4E66-AE4C-D8A27C206F89}.Release|x64.ActiveCfg = Release|Any CPU
+		{D0CF87C0-73B7-4E66-AE4C-D8A27C206F89}.Release|x64.Build.0 = Release|Any CPU
+		{D0CF87C0-73B7-4E66-AE4C-D8A27C206F89}.Release|x86.ActiveCfg = Release|Any CPU
+		{D0CF87C0-73B7-4E66-AE4C-D8A27C206F89}.Release|x86.Build.0 = Release|Any CPU
+		{12E19B00-49AB-49CC-AC36-A534D61D65F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12E19B00-49AB-49CC-AC36-A534D61D65F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12E19B00-49AB-49CC-AC36-A534D61D65F2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{12E19B00-49AB-49CC-AC36-A534D61D65F2}.Debug|x64.Build.0 = Debug|Any CPU
+		{12E19B00-49AB-49CC-AC36-A534D61D65F2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{12E19B00-49AB-49CC-AC36-A534D61D65F2}.Debug|x86.Build.0 = Debug|Any CPU
+		{12E19B00-49AB-49CC-AC36-A534D61D65F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12E19B00-49AB-49CC-AC36-A534D61D65F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12E19B00-49AB-49CC-AC36-A534D61D65F2}.Release|x64.ActiveCfg = Release|Any CPU
+		{12E19B00-49AB-49CC-AC36-A534D61D65F2}.Release|x64.Build.0 = Release|Any CPU
+		{12E19B00-49AB-49CC-AC36-A534D61D65F2}.Release|x86.ActiveCfg = Release|Any CPU
+		{12E19B00-49AB-49CC-AC36-A534D61D65F2}.Release|x86.Build.0 = Release|Any CPU
+		{B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF}.Debug|x64.Build.0 = Debug|Any CPU
+		{B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF}.Debug|x86.Build.0 = Debug|Any CPU
+		{B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF}.Release|x64.ActiveCfg = Release|Any CPU
+		{B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF}.Release|x64.Build.0 = Release|Any CPU
+		{B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF}.Release|x86.ActiveCfg = Release|Any CPU
+		{B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF}.Release|x86.Build.0 = Release|Any CPU
+		{2A160B94-894D-4FB2-AC91-0A661B7487BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A160B94-894D-4FB2-AC91-0A661B7487BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A160B94-894D-4FB2-AC91-0A661B7487BA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2A160B94-894D-4FB2-AC91-0A661B7487BA}.Debug|x64.Build.0 = Debug|Any CPU
+		{2A160B94-894D-4FB2-AC91-0A661B7487BA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2A160B94-894D-4FB2-AC91-0A661B7487BA}.Debug|x86.Build.0 = Debug|Any CPU
+		{2A160B94-894D-4FB2-AC91-0A661B7487BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A160B94-894D-4FB2-AC91-0A661B7487BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A160B94-894D-4FB2-AC91-0A661B7487BA}.Release|x64.ActiveCfg = Release|Any CPU
+		{2A160B94-894D-4FB2-AC91-0A661B7487BA}.Release|x64.Build.0 = Release|Any CPU
+		{2A160B94-894D-4FB2-AC91-0A661B7487BA}.Release|x86.ActiveCfg = Release|Any CPU
+		{2A160B94-894D-4FB2-AC91-0A661B7487BA}.Release|x86.Build.0 = Release|Any CPU
+		{6F714FA5-1DDC-473F-95CE-7DFB45E8E182}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F714FA5-1DDC-473F-95CE-7DFB45E8E182}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F714FA5-1DDC-473F-95CE-7DFB45E8E182}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6F714FA5-1DDC-473F-95CE-7DFB45E8E182}.Debug|x64.Build.0 = Debug|Any CPU
+		{6F714FA5-1DDC-473F-95CE-7DFB45E8E182}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6F714FA5-1DDC-473F-95CE-7DFB45E8E182}.Debug|x86.Build.0 = Debug|Any CPU
+		{6F714FA5-1DDC-473F-95CE-7DFB45E8E182}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F714FA5-1DDC-473F-95CE-7DFB45E8E182}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F714FA5-1DDC-473F-95CE-7DFB45E8E182}.Release|x64.ActiveCfg = Release|Any CPU
+		{6F714FA5-1DDC-473F-95CE-7DFB45E8E182}.Release|x64.Build.0 = Release|Any CPU
+		{6F714FA5-1DDC-473F-95CE-7DFB45E8E182}.Release|x86.ActiveCfg = Release|Any CPU
+		{6F714FA5-1DDC-473F-95CE-7DFB45E8E182}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -341,5 +423,10 @@ Global
 		{1ACF7038-AA93-42C6-8BB7-F827268E59F6} = {B33BAB01-0854-4D5A-9B90-E4FC1156CFDA}
 		{995E19DC-F7B9-4D81-AE6D-5B41415CFA5E} = {3190C22A-CF74-4608-8258-E57578589088}
 		{9FDDB085-8ABE-40B7-9718-2396F3101B50} = {3190C22A-CF74-4608-8258-E57578589088}
+		{D0CF87C0-73B7-4E66-AE4C-D8A27C206F89} = {3190C22A-CF74-4608-8258-E57578589088}
+		{12E19B00-49AB-49CC-AC36-A534D61D65F2} = {3190C22A-CF74-4608-8258-E57578589088}
+		{B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF} = {3190C22A-CF74-4608-8258-E57578589088}
+		{2A160B94-894D-4FB2-AC91-0A661B7487BA} = {3190C22A-CF74-4608-8258-E57578589088}
+		{6F714FA5-1DDC-473F-95CE-7DFB45E8E182} = {3190C22A-CF74-4608-8258-E57578589088}
 	EndGlobalSection
 EndGlobal
