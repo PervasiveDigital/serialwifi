@@ -62,7 +62,7 @@ namespace SimpleHttpTest
             }
             Debug.Print("-- end of list -------------");
 
-            wifi.Connect("CloudGate", "Escal8shun", false);
+            wifi.Connect("XXX", "XXX", false);
 
             Debug.Print("Station IP address : " + wifi.StationIPAddress.ToString());
             Debug.Print("Station MAC address : " + wifi.StationMacAddress);

@@ -1002,7 +1002,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             if (result == null)
                 result = (string)_commandSet40[cmd];
             if (result==null)
-                throw new Exception("command table is corrupted");
+                throw new Exception("command not supported");
             return result;
         }
 
