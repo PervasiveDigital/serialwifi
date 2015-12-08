@@ -379,10 +379,12 @@ namespace PervasiveDigital.Hardware.ESP8266
                                     line = StringUtilities.ConvertToString(_buffer.Get(idxNewline)).Trim();
                                 // eat the newline too
                                 _buffer.Skip(1);
-                                if (line != null && line.Length > 0)
+                                if (!StringUtilities.IsNullOrEmpty(line))
                                 {
                                     if (_enableDebugOutput)
                                         Log("Received : " + line);
+
+                                    // Handle async notifications and command responses
                                     var idxClosed = line.IndexOf(",CLOSED");
                                     if (idxClosed != -1)
                                     {

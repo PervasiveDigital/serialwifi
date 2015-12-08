@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{783D5000-6184-438A-9B01-3D7090C819E2}"
 EndProject
@@ -107,6 +107,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PervasiveDigital.Net.Azure.Storage.netmf44", "netmf44\PervasiveDigital.Net.Azure.Storage\PervasiveDigital.Net.Azure.Storage.netmf44.csproj", "{2A160B94-894D-4FB2-AC91-0A661B7487BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PervasiveDigital.Net.Azure.MobileServices.netmf44", "netmf44\PervasiveDigital.Net.Azure.MobileServices\PervasiveDigital.Net.Azure.MobileServices.netmf44.csproj", "{6F714FA5-1DDC-473F-95CE-7DFB45E8E182}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{383A1129-B303-4F24-9A4D-EF8A90BAD4EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleHttpTest.netmf44", "SimpleHttpTest.netmf44\SimpleHttpTest.netmf44.csproj", "{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -393,6 +397,24 @@ Global
 		{6F714FA5-1DDC-473F-95CE-7DFB45E8E182}.Release|x64.Build.0 = Release|Any CPU
 		{6F714FA5-1DDC-473F-95CE-7DFB45E8E182}.Release|x86.ActiveCfg = Release|Any CPU
 		{6F714FA5-1DDC-473F-95CE-7DFB45E8E182}.Release|x86.Build.0 = Release|Any CPU
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}.Debug|x64.Build.0 = Debug|Any CPU
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}.Debug|x64.Deploy.0 = Debug|Any CPU
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}.Debug|x86.Build.0 = Debug|Any CPU
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}.Debug|x86.Deploy.0 = Debug|Any CPU
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}.Release|x64.ActiveCfg = Release|Any CPU
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}.Release|x64.Build.0 = Release|Any CPU
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}.Release|x64.Deploy.0 = Release|Any CPU
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}.Release|x86.ActiveCfg = Release|Any CPU
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}.Release|x86.Build.0 = Release|Any CPU
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48}.Release|x86.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -428,5 +450,7 @@ Global
 		{B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF} = {3190C22A-CF74-4608-8258-E57578589088}
 		{2A160B94-894D-4FB2-AC91-0A661B7487BA} = {3190C22A-CF74-4608-8258-E57578589088}
 		{6F714FA5-1DDC-473F-95CE-7DFB45E8E182} = {3190C22A-CF74-4608-8258-E57578589088}
+		{383A1129-B303-4F24-9A4D-EF8A90BAD4EE} = {3190C22A-CF74-4608-8258-E57578589088}
+		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48} = {383A1129-B303-4F24-9A4D-EF8A90BAD4EE}
 	EndGlobalSection
 EndGlobal
