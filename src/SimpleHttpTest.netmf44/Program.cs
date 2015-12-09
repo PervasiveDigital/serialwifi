@@ -1,8 +1,9 @@
-//#define CREATE_ACCESS_POINT
+#define CREATE_ACCESS_POINT
 
 using System;
 using System.Collections;
 using System.IO.Ports;
+using System.Net;
 using System.Threading;
 using PervasiveDigital.Hardware.ESP8266;
 using Microsoft.SPOT;
@@ -29,6 +30,10 @@ namespace SimpleHttpTest
         {
             var port = new SerialPort("COM2", 115200, Parity.None, 8, StopBits.One);
             var wifi = new Esp8266WifiDevice(port, _rfPower, null);
+            wifi.HardwareFault += (sender, cause) =>
+            {
+                Debug.Print("The ESP8266 rebooted with a reason code of " + cause.ToString());
+            };
             // On Oxygen+Neon, you can use use new NeonWifiDevice() without providing a port or power pin definition
 
             // Enable echoing of commands
@@ -38,9 +43,7 @@ namespace SimpleHttpTest
             //wifi.EnableVerboseOutput = true;
 
 #if CREATE_ACCESS_POINT
-            wifi.SetOperatingMode(OperatingMode.AccessPoint, false);
-            wifi.ConfigureAccessPoint("serwifitest", "24681234", 5, Ecn.WPA2_PSK, false);
-            wifi.EnableDhcp(OperatingMode.AccessPoint, true, false);
+            wifi.ConfigureAccessPoint("serwifitest", "24681234", 7, Ecn.Open);
 
             Debug.Print("AP SSID : " + wifi.AccessPointSsid);
             Debug.Print("AP Password : " + wifi.AccessPointPassword);
@@ -52,7 +55,7 @@ namespace SimpleHttpTest
             Debug.Print("AP Gateway address : " + wifi.AccessPointGateway.ToString());
             Debug.Print("AP netmask : " + wifi.AccessPointNetmask.ToString());
 #else
-            wifi.SetOperatingMode(OperatingMode.Station, true);
+            wifi.SetOperatingMode(OperatingMode.Station);
 
             Debug.Print("Access points:");
             var apList = wifi.GetAccessPoints();
@@ -109,6 +112,11 @@ namespace SimpleHttpTest
                 }
                 Thread.Sleep(500);
             }
+        }
+
+        private static void UpdateProgressCallback(string progress)
+        {
+            Debug.Print(progress);
         }
 
         private static void OnServerConnectionOpened(object sender, WifiSocket socket)

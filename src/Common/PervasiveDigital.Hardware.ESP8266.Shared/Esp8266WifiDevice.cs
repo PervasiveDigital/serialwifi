@@ -16,15 +16,16 @@ namespace PervasiveDigital.Hardware.ESP8266
         // The amount of time that we will search for 'OK' in response to joining an AP
         public const int JoinTimeout = 30000;
 
-        public const string AT = "AT";
-        public const string OK = "OK";
-        public const string ErrorReply = "ERROR";
-        public const string ConnectReply = "CONNECT";
+        private const string AT = "AT";
+        private const string OK = "OK";
+        private const string ErrorReply = "ERROR";
+        private const string ConnectReply = "CONNECT";
 
         public enum Commands
         {
            EchoOffCommand,
            ResetCommand,
+           RestoreCommand,
            GetFirmwareVersionCommand,
            SetOperatingModeCommand,
            GetOperatingModeCommand,
@@ -93,6 +94,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         private object _oplock = new object();
 
         public event WifiBootedEventHandler Booted;
+        public event HardwareFaultHandler HardwareFault;
         //public event WifiErrorEventHandler Error;
         //public event WifiConnectionStateEventHandler ConnectionStateChanged;
 
@@ -119,8 +121,15 @@ namespace PervasiveDigital.Hardware.ESP8266
             _esp.DataReceived += OnDataReceived;
             _esp.SocketClosed += OnSocketClosed;
             _esp.SocketOpened += _esp_SocketOpened;
+            _esp.Fault += OnEspFault;
             _esp.Start();
             ThreadPool.QueueUserWorkItem(BackgroundInitialize);
+        }
+
+        private void OnEspFault(object sender, int cause)
+        {
+            if (this.HardwareFault != null)
+                this.HardwareFault(this, cause);
         }
 
         public void Dispose()
@@ -175,6 +184,15 @@ namespace PervasiveDigital.Hardware.ESP8266
                     }
                 }
                 BackgroundInitialize(null);
+            }
+        }
+
+        public void Restore()
+        {
+            EnsureInitialized();
+            lock (_oplock)
+            {
+                _esp.SendAndReadUntil(Command(Commands.RestoreCommand), OK);
             }
         }
 
@@ -602,7 +620,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             return _stationAddress; 
         }
 
-        public void SetStationIPAddress(IPAddress value, bool persist)
+        public void SetStationIPAddress(IPAddress value, bool persist = false)
         { 
             EnsureInitialized();
             lock (_oplock)
@@ -636,7 +654,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             return _apAddress; 
         }
 
-        public void SetAccessPointIPAddress(IPAddress value, bool persist)
+        public void SetAccessPointIPAddress(IPAddress value, bool persist = false)
         {
             EnsureInitialized();
             lock (_oplock)
@@ -722,7 +740,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             return _stationMacAddress;
         }
 
-        public void SetStationMacAddress(string value, bool persist)
+        public void SetStationMacAddress(string value, bool persist = false)
         { 
             EnsureInitialized();
             lock (_oplock)
@@ -750,7 +768,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             return _apMacAddress;
         }
 
-        public void SetAccessPointMacAddress(string value, bool persist)
+        public void SetAccessPointMacAddress(string value, bool persist = false)
         {
             EnsureInitialized();
             lock (_oplock)
@@ -766,8 +784,8 @@ namespace PervasiveDigital.Hardware.ESP8266
             EnsureInitialized();
             lock (_oplock)
             {
-                if (this.Mode != OperatingMode.Station)
-                    throw new Exception("You must be in 'Station' mode to retrieve access points.");
+                //if (this.Mode != OperatingMode.Station)
+                //    throw new Exception("You must be in 'Station' mode to retrieve access points.");
 
                 var response = _esp.SendAndReadUntil(Command(Commands.ListAccessPointsCommand), OK);
                 foreach (var line in response)
@@ -980,13 +998,26 @@ namespace PervasiveDigital.Hardware.ESP8266
             _commandSet40[Commands.SendCommand] = "AT+CIPSEND=";
             _commandSet40[Commands.SendCommandReply] = "SEND OK";
 
+            _commandSet51[Commands.RestoreCommand] = new[] { "AT+RESTORE", "AT+RESTORE" };
             _commandSet51[Commands.SetOperatingModeCommand] = new[] { "AT+CWMODE_CUR=", "AT+CWMODE_DEF=" };
+            _commandSet51[Commands.GetOperatingModeCommand] = new[] { "AT+CWMODE_CUR?", "AT+CWMODE_DEF?" };
+            _commandSet51[Commands.GetOperatingModeResponse] = new[] { "+CWMODE_CUR:", "+CWMODE_DEF:" };
             _commandSet51[Commands.SetDhcpMode] = new[] { "AT+CWDHCP_CUR=", "AT+CWDHCP_DEF=" };
+            _commandSet51[Commands.GetAccessPointModeCommand] = new[] { "AT+CWSAP_CUR?", "AT+CWSAP_DEF?" };
             _commandSet51[Commands.SetAccessPointModeCommand] = new[] { "AT+CWSAP_CUR=", "AT+CWSAP_DEF=" };
+            _commandSet51[Commands.GetAccessPointModeResponse] = new[] { "+CWSAP_CUR:", "+CWSAP_DEF:" };
             _commandSet51[Commands.SetStationAddressCommand] = new[] { "AT+CIPSTA_CUR=", "AT+CIPSTA_DEF=" };
+            _commandSet51[Commands.GetStationAddressCommand] = new[] { "AT+CIPSTA_CUR?", "AT+CIPSTA_DEF?" };
+            _commandSet51[Commands.GetStationAddressResponse] = new[] { "+CIPSTA_CUR:", "+CIPSTA_DEF:" };
             _commandSet51[Commands.SetApAddressCommand] = new[] { "AT+CIPAP_CUR=", "AT+CIPAP_DEF=" };
+            _commandSet51[Commands.GetApAddressCommand] = new[] { "AT+CIPAP_CUR?", "AT+CIPAP_DEF?" };
+            _commandSet51[Commands.GetApAddressResponse] = new[] { "+CIPAP_CUR:", "+CIPAP_DEF:" };
             _commandSet51[Commands.SetStationMacAddress] = new[] { "AT+CIPSTAMAC_CUR=", "AT+CIPSTAMAC_DEF=" };
+            _commandSet51[Commands.GetStationMacAddress] = new[] { "AT+CIPSTAMAC_CUR?", "AT+CIPSTAMAC_DEF?" };
+            _commandSet51[Commands.GetStationMacAddressResponse] = new[] { "+CIPSTAMAC_CUR:", "+CIPSTAMAC_DEF:" };
             _commandSet51[Commands.SetApMacAddress] = new[] { "AT+CIPAPMAC_CUR=", "AT+CIPAPMAC_DEF=" };
+            _commandSet51[Commands.GetApMacAddress] = new[] { "AT+CIPAPMAC_CUR?", "AT+CIPAPMAC_DEF?" };
+            _commandSet51[Commands.GetApMacAddressResponse] = new[] { "+CIPAPMAC_CUR:", "+CIPAPMAC_DEF:" };
             _commandSet51[Commands.JoinAccessPointCommand] = new[] { "AT+CWJAP_CUR=", "AT+CWJAP_DEF=" };
         }
 
@@ -1006,9 +1037,20 @@ namespace PervasiveDigital.Hardware.ESP8266
             return result;
         }
 
-        private string Response(Commands cmd)
+        private string Response(Commands cmd, bool persist = false)
         {
-            return (string)_commandSet40[cmd];
+            string result = null;
+            if (_protocol == Protocols.Protocol_51)
+            {
+                var cmds = ((string[])_commandSet51[cmd]);
+                if (cmds != null)
+                    result = cmds[persist ? 1 : 0];
+            }
+            if (result == null)
+                result = (string)_commandSet40[cmd];
+            if (result == null)
+                throw new Exception("command not supported");
+            return result;
         }
 
         private void GetStationAddressInfo()

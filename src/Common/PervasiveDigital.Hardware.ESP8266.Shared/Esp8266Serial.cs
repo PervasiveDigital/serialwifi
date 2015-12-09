@@ -8,6 +8,8 @@ using PervasiveDigital.Utilities;
 
 namespace PervasiveDigital.Hardware.ESP8266
 {
+    public delegate void HardwareFaultHandler(object sender, int cause);
+
     internal class Esp8266Serial
     {
         public delegate void DataReceivedHandler(object sender, byte[] stream, int channel);
@@ -31,6 +33,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         public event DataReceivedHandler DataReceived;
         public event SocketOpenedHandler SocketOpened;
         public event SocketClosedHandler SocketClosed;
+        public event HardwareFaultHandler Fault;
 
         private int _cbStream = 0;
         private int _receivingOnChannel;
@@ -384,8 +387,29 @@ namespace PervasiveDigital.Hardware.ESP8266
                                     if (_enableDebugOutput)
                                         Log("Received : " + line);
 
-                                    // Handle async notifications and command responses
-                                    var idxClosed = line.IndexOf(",CLOSED");
+                                    if (line.StartsWith("ets "))
+                                    {
+                                        // we're rebooting
+                                        var idxCause = line.IndexOf("rst cause:");
+                                        int iCause = -1;
+                                        if (idxCause != -1)
+                                        {
+                                            var start = idxCause + 10;
+                                            var idxComma = line.Substring(start).IndexOf(',');
+                                            iCause = int.Parse(line.Substring(start, idxComma));
+                                        }
+                                        if (this.Fault != null)
+                                            this.Fault(this, iCause);
+                                    }
+                                    if (line.StartsWith("wdt ") ||
+                                        line.StartsWith("load ") ||
+                                        line.StartsWith("tail ") ||
+                                        line.StartsWith("chksum ") ||
+                                        line.StartsWith("csum "))
+                                        return;
+
+                                        // Handle async notifications and command responses
+                                        var idxClosed = line.IndexOf(",CLOSED");
                                     if (idxClosed != -1)
                                     {
                                         // Handle socket-closed notification
