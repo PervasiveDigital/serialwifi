@@ -91,13 +91,14 @@ namespace PervasiveDigital.Net.Azure.Storage
 
                 string canResource = StringUtilities.Format("/{0}/{1}/{2}", _account.AccountName, containerName, blobName);
 
-                string authHeader = CreateAuthorizationHeader(canResource, "\nx-ms-blob-type:BlockBlob", contentLength);
+                var timestamp = GetDateHeader();
+                string authHeader = CreateAuthorizationHeader(canResource, timestamp, "\nx-ms-blob-type:BlockBlob", contentLength);
 
                 try
                 {
                     var blobTypeHeaders = new Hashtable();
                     blobTypeHeaders.Add("x-ms-blob-type", "BlockBlob");
-                    var response = AzureStorageHttpHelper.SendWebRequest(_client, deploymentPath, authHeader, GetDateHeader(), VersionHeader, ms, contentLength, HttpVerb, true, blobTypeHeaders);
+                    var response = AzureStorageHttpHelper.SendWebRequest(_client, deploymentPath, authHeader, timestamp, VersionHeader, ms, contentLength, HttpVerb, true, blobTypeHeaders);
                     if (response.StatusCode != HttpStatusCode.Created)
                     {
                         Debug.Print("Deployment Path was " + deploymentPath);
@@ -143,11 +144,12 @@ namespace PervasiveDigital.Net.Azure.Storage
 
                 string canResource = StringUtilities.Format("/{0}/{1}/{2}", _account.AccountName, containerName, blobName);
 
-                string authHeader = CreateAuthorizationHeader(canResource);
+                var timestamp = GetDateHeader();
+                string authHeader = CreateAuthorizationHeader(canResource, timestamp);
 
                 try
                 {
-                    var response = AzureStorageHttpHelper.SendWebRequest(_client, deploymentPath, authHeader, GetDateHeader(), VersionHeader, null, 0, HttpVerb, true);
+                    var response = AzureStorageHttpHelper.SendWebRequest(_client, deploymentPath, authHeader, timestamp, VersionHeader, null, 0, HttpVerb, true);
                     if (response.StatusCode != HttpStatusCode.Accepted)
                     {
                         Debug.Print("Deployment Path was " + deploymentPath);
@@ -192,11 +194,12 @@ namespace PervasiveDigital.Net.Azure.Storage
                 string canResource = StringUtilities.Format("/{0}/{1}\nrestype:container", _account.AccountName,
                     containerName);
 
-                string authHeader = CreateAuthorizationHeader(canResource);
+                var timestamp = GetDateHeader();
+                string authHeader = CreateAuthorizationHeader(canResource, timestamp);
 
                 try
                 {
-                    var response = AzureStorageHttpHelper.SendWebRequest(_client, deploymentPath, authHeader, GetDateHeader(), VersionHeader, null, 0, HttpVerb, true);
+                    var response = AzureStorageHttpHelper.SendWebRequest(_client, deploymentPath, authHeader, timestamp, VersionHeader, null, 0, HttpVerb, true);
                     if (response.StatusCode != HttpStatusCode.Created)
                     {
                         Debug.Print("Deployment Path was " + deploymentPath);
@@ -241,11 +244,12 @@ namespace PervasiveDigital.Net.Azure.Storage
                 string canResource = StringUtilities.Format("/{0}/{1}\nrestype:container", _account.AccountName,
                     containerName);
 
-                string authHeader = CreateAuthorizationHeader(canResource);
+                var timestamp = GetDateHeader();
+                string authHeader = CreateAuthorizationHeader(canResource, timestamp);
 
                 try
                 {
-                    var response = AzureStorageHttpHelper.SendWebRequest(_client, deploymentPath, authHeader, GetDateHeader(), VersionHeader, null, 0, HttpVerb, true);
+                    var response = AzureStorageHttpHelper.SendWebRequest(_client, deploymentPath, authHeader, timestamp, VersionHeader, null, 0, HttpVerb, true);
                     if (response.StatusCode != HttpStatusCode.Accepted)
                     {
                         Debug.Print("Deployment Path was " + deploymentPath);
@@ -294,10 +298,10 @@ namespace PervasiveDigital.Net.Azure.Storage
         //    return ms;
         //}
 
-        protected string CreateAuthorizationHeader(string canResource, string options = "", int contentLength = 0)
+        protected string CreateAuthorizationHeader(string canResource, string timestamp, string options = "", int contentLength = 0)
         {
             string toSign = StringUtilities.Format("{0}\n\n\n{1}\n\n\n\n\n\n\n\n{5}\nx-ms-date:{2}\nx-ms-version:{3}\n{4}",
-                                          HttpVerb, contentLength, GetDateHeader(), VersionHeader, canResource, options);
+                                          HttpVerb, contentLength, timestamp, VersionHeader, canResource, options);
 
             var hmac = new HMACSHA256(Convert.FromBase64String(_account.AccountKey));
             var hmacBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(toSign));
@@ -312,7 +316,7 @@ namespace PervasiveDigital.Net.Azure.Storage
 
         protected string GetDateHeader()
         {
-            return DateTime.Now.ToString("R");
+            return DateTime.UtcNow.ToString("R");
 
         }
 
