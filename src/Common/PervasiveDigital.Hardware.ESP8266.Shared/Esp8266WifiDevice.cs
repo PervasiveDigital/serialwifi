@@ -259,7 +259,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             EnsureInitialized();
             lock (_oplock)
             {
-                _esp.SendAndExpect(Command(Commands.ServerCommand) + "1," + port, OK);
+                _esp.SendAndExpect(Command(Commands.ServerCommand) + "1," + port, new [] { "no change" }, OK);
                 _inboundPort = port;
                 _onServerConnectionOpenedHandler = onServerConnectionOpenedHandler;
             }

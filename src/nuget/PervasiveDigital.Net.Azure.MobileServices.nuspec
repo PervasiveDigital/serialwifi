@@ -3,7 +3,7 @@
   <metadata>
     <id>PervasiveDigital.Net.Azure.MobileServices</id>
     <title>Azure Mobile Services for Serial Wifi</title>
-    <version>3.0.2-beta</version>
+    <version>3.0.9</version>
     <authors>Martin Calsyn</authors>
     <owners>Pervasive Digital LLC</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
@@ -22,8 +22,8 @@
       <frameworkAssembly assemblyName="Microsoft.SPOT.Hardware" />
     </frameworkAssemblies>
     <dependencies>
-      <dependency id="PervasiveDigital.Net" version="3.0.0-beta" />
-      <dependency id="PervasiveDigital.Utility" version="3.0.0-beta" />
+      <dependency id="PervasiveDigital.Net" version="3.0.9" />
+      <dependency id="PervasiveDigital.Utility" version="3.0.9" />
     </dependencies>
   </metadata>
 </package>

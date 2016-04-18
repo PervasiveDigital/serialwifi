@@ -89,13 +89,31 @@ namespace PervasiveDigital.Hardware.ESP8266
             SendAndExpect(send, expect, DefaultCommandTimeout);
         }
 
+        public void SendAndExpect(string send, string[] accept, string expect)
+        {
+            SendAndExpect(send, accept, expect, DefaultCommandTimeout);
+        }
+
         public void SendAndExpect(string send, string expect, int timeout)
         {
             lock (_lockSendExpect)
             {
                 DiscardBufferedInput();
                 WriteCommand(send);
-                Expect(new[] { send }, expect, timeout);
+                Expect(new[] { send, "no change" }, expect, timeout);
+            }
+        }
+
+        public void SendAndExpect(string send, string[] accept, string expect, int timeout)
+        {
+            lock (_lockSendExpect)
+            {
+                DiscardBufferedInput();
+                WriteCommand(send);
+                var acceptList = new string[accept.Length + 1];
+                acceptList[0] = send;
+                Array.Copy(accept, 0, acceptList, 1, accept.Length);
+                Expect(acceptList, expect, timeout);
             }
         }
 

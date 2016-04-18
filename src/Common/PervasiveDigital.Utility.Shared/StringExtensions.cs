@@ -43,6 +43,32 @@ namespace PervasiveDigital.Utilities
             return returning.ToString();
         }
 
+        public static bool Contains(this string source, string check)
+        {
+            // check string must be smaller
+            try
+            {
+                if (check.Length > source.Length)
+                    return false;
+
+                // Now do the easy check
+                if (source == check)
+                    return true;
+
+                for (int i = 0; i < source.Length; i++)
+                {
+                    if (source.Substring(i, check.Length) == check)
+                        return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+
+            return false;
+        }
+
         public static bool StartsWith(this string source, string search)
         {
             if (source == null)
