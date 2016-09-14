@@ -48,6 +48,12 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\PervasiveDigital.Diagnostics\PervasiveDigital.Diagnostics.netmf43.csproj">
+      <Project>{95FCA797-76BC-4A56-B913-92EF6B22C6E8}</Project>
+      <Name>PervasiveDigital.Diagnostics.netmf43</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Condition="EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <Import Condition="!EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

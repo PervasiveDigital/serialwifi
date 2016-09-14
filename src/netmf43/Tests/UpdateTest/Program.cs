@@ -25,7 +25,7 @@ namespace UpdateTest
             wifi.EnableDebugOutput = true;
             //wifi.EnableVerboseOutput = true;
 
-            wifi.Mode = OperatingMode.Station;
+            wifi.SetOperatingMode(OperatingMode.Station);
             wifi.Connect("XXX", "XXX");
 
             Debug.Print("Version before update : ");
