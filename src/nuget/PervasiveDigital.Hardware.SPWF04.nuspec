@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>PervasiveDigital.Hardware.SPWF04</id>
+    <title>SPWF04 driver for .Net Micro Framework</title>
+    <version>4.0.1-beta</version>
+    <authors>Martin Calsyn</authors>
+    <owners>Pervasive Digital LLC</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
+    <projectUrl>https://github.com/DotNetOpenAutomation/serialwifi</projectUrl>
+    <iconUrl>https://dl.dropboxusercontent.com/u/24099742/Pervasive-Digital-Icon-notext.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>This package includes a .Net Micro Framework Managed driver for the SPWF04 wifi</summary>
+    <description>
+      This library provides .Net Micro Framework support for the SPWF04 family of serial-interface wifi boards
+    </description>
+    <releaseNotes>Initial release</releaseNotes>
+    <copyright>Copyright 2015 Pervasive Digital LLC</copyright>
+    <tags>NETMF MicroFramework IoT SPWF04</tags>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.SPOT.Native" />
+      <frameworkAssembly assemblyName="Microsoft.SPOT.Hardware" />
+    </frameworkAssemblies>
+    <dependencies>
+      <dependency id="PervasiveDigital.Net" version="3.0.0-beta" />
+      <dependency id="PervasiveDigital.Utility" version="3.0.0-beta" />
+    </dependencies>
+  </metadata>
+</package>

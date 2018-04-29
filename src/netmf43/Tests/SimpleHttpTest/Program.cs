@@ -46,7 +46,7 @@ namespace SimpleHttpTest
             Debug.Print("-- end of list -------------");
 
 #if CREATE_ACCESS_POINT
-            wifi.Mode = OperatingMode.Both;
+            //wifi.Mode = OperatingMode.Both;
             wifi.ConfigureAccessPoint("serwifitest", "24681234", 5, Ecn.WPA2_PSK);
             wifi.EnableDhcp(OperatingMode.AccessPoint, true);
 #else

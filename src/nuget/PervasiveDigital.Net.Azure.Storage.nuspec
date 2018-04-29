@@ -3,7 +3,7 @@
   <metadata>
     <id>PervasiveDigital.Net.Azure.Storage</id>
     <title>Azure Storage Services for Serial Wifi</title>
-    <version>3.0.2-beta</version>
+    <version>4.0.1-beta</version>
     <authors>Martin Calsyn</authors>
     <owners>Pervasive Digital LLC</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
@@ -16,7 +16,7 @@
     </description>
     <releaseNotes>Initial release</releaseNotes>
     <copyright>Copyright 2015 Pervasive Digital LLC</copyright>
-    <tags>NETMF MicroFramework IoT Molecule.Net Azure</tags>
+    <tags>NETMF MicroFramework IoT Azure</tags>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="Microsoft.SPOT.Native" />
       <frameworkAssembly assemblyName="Microsoft.SPOT.Hardware" />
