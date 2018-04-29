@@ -15,6 +15,7 @@ namespace SimpleHttpTest
     public class Program
     {
         private static readonly OutputPort _userLed = new OutputPort(Cpu.Pin.GPIO_Pin15, false);
+        private static bool _wifiIsConnected = false;
 
         // In order to create a truly robust long-running solution, you must combine the code below
         //   with proper use of a Watchdog Timer and exception handling on the wifi calls.
@@ -29,6 +30,17 @@ namespace SimpleHttpTest
 
             wifi.EnableDebugOutput = true;
             //wifi.EnableVerboseOutput = true;
+            wifi.WifiConnectionStateChanged += Wifi_WifiConnectionStateChanged;
+
+            wifi.EnableWifi(false);
+            wifi.SetPrivacyMode(2);
+            wifi.Connect("Calsynshire-24", "Escal8shun");
+            wifi.EnableWifi(true);
+
+            while (!_wifiIsConnected)
+            {
+                Thread.Sleep(500);
+            }
 
             int iCounter = 0;
             bool state = true;
@@ -57,6 +69,11 @@ namespace SimpleHttpTest
 //                }
                 Thread.Sleep(500);
             }
+        }
+
+        private static void Wifi_WifiConnectionStateChanged(object sender, bool connected)
+        {
+            _wifiIsConnected = connected;
         }
 
         private static void OnServerConnectionOpened(object sender, WifiSocket socket)

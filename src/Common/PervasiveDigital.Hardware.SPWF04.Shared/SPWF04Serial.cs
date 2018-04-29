@@ -10,6 +10,8 @@ namespace PervasiveDigital.Hardware.SPWF04
 {
     public delegate void HardwareFaultHandler(object sender, int cause);
 
+    public delegate void IndicationReceivedHandler(object sender, int code, string details);
+
     internal class Spwf04Serial
     {
         public delegate void DataReceivedHandler(object sender, byte[] stream, int channel);
@@ -34,6 +36,7 @@ namespace PervasiveDigital.Hardware.SPWF04
         public event SocketOpenedHandler SocketOpened;
         public event SocketClosedHandler SocketClosed;
         public event HardwareFaultHandler Fault;
+        public event IndicationReceivedHandler IndicationReceived;
 
         private int _cbStream = 0;
         private int _receivingOnChannel;
@@ -89,7 +92,22 @@ namespace PervasiveDigital.Hardware.SPWF04
             SendAndExpect(send, expect, DefaultCommandTimeout);
         }
 
+        public void SendAndExpect(string send, string[] expect)
+        {
+            SendAndExpect(send, expect, DefaultCommandTimeout);
+        }
+
         public void SendAndExpect(string send, string expect, int timeout)
+        {
+            lock (_lockSendExpect)
+            {
+                DiscardBufferedInput();
+                WriteCommand(send);
+                Expect(new[] { send }, new[] { expect }, timeout);
+            }
+        }
+
+        public void SendAndExpect(string send, string[] expect, int timeout)
         {
             lock (_lockSendExpect)
             {
@@ -156,22 +174,22 @@ namespace PervasiveDigital.Hardware.SPWF04
             return response;
         }
 
-        public void Expect(string expect)
+        public void Expect(string[] expect)
         {
             Expect(null, expect, DefaultCommandTimeout);
         }
 
-        public void Expect(string expect, int timeout)
+        public void Expect(string[] expect, int timeout)
         {
             Expect(null, expect, timeout);
         }
 
-        public void Expect(string[] accept, string expect)
+        public void Expect(string[] accept, string[] expect)
         {
             Expect(accept, expect, DefaultCommandTimeout);
         }
 
-        public void Expect(string[] accept, string expect, int timeout)
+        public void Expect(string[] accept, string[] expect, int timeout)
         {
             if (accept == null)
                 accept = new[] { "" };
@@ -196,11 +214,17 @@ namespace PervasiveDigital.Hardware.SPWF04
                     }
                 }
             } while (acceptableInputFound);
-#if MF_FRAMEWORK
-            if (!string.Equals(response.ToLower(), expect.ToLower()))
-#else
-            if (!string.Equals(response, expect, StringComparison.OrdinalIgnoreCase))
-#endif
+
+            bool foundExpectedResponse = false;
+            foreach (var s in expect)
+            {
+                if (response.ToLower().StartsWith(s.ToLower()))
+                {
+                    foundExpectedResponse = true;
+                    break;
+                }
+            }
+            if (!foundExpectedResponse)
             {
                 throw new FailedExpectException(expect, response);
             }
@@ -387,29 +411,14 @@ namespace PervasiveDigital.Hardware.SPWF04
                                     if (_enableDebugOutput)
                                         Log("Received : " + line);
 
-                                    if (line.StartsWith("ets "))
-                                    {
-                                        // we're rebooting
-                                        var idxCause = line.IndexOf("rst cause:");
-                                        int iCause = -1;
-                                        if (idxCause != -1)
-                                        {
-                                            var start = idxCause + 10;
-                                            var idxComma = line.Substring(start).IndexOf(',');
-                                            iCause = int.Parse(line.Substring(start, idxComma));
-                                        }
-                                        if (this.Fault != null)
-                                            this.Fault(this, iCause);
-                                    }
-                                    if (line.StartsWith("wdt ") ||
-                                        line.StartsWith("load ") ||
-                                        line.StartsWith("tail ") ||
-                                        line.StartsWith("chksum ") ||
-                                        line.StartsWith("csum "))
-                                        return;
 
-                                        // Handle async notifications and command responses
-                                        var idxClosed = line.IndexOf(",CLOSED");
+                                    // Handle async notifications and command responses
+                                    if (line.StartsWith("+WIND:"))
+                                    {
+                                        HandleAsyncIndication(line);
+                                    }
+
+                                    var idxClosed = line.IndexOf(",CLOSED");
                                     if (idxClosed != -1)
                                     {
                                         // Handle socket-closed notification
@@ -475,6 +484,15 @@ namespace PervasiveDigital.Hardware.SPWF04
                     Monitor.Exit(_readLoopMonitor);
                 }
             } while (_cbStream > 0 && _buffer.Size > 0);
+        }
+
+        private void HandleAsyncIndication(string indstr)
+        {
+            //+WIND:nn:reason
+            var idxColon = indstr.IndexOf(':', 6);
+            var code = int.Parse(indstr.Substring(6, idxColon-6));
+            if (this.IndicationReceived!=null)
+                this.IndicationReceived(this, code, indstr.Substring(idxColon + 1));
         }
 
         private void DataReceivedThunk(object state)

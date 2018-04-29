@@ -5,7 +5,7 @@ namespace PervasiveDigital.Hardware.SPWF04
 {
     public class FailedExpectException : Exception
     {
-        public FailedExpectException(string command, string expected, string actual)
+        public FailedExpectException(string command, string[] expected, string actual)
 #if MF_FRAMEWORK
             : base("Unexpected response to a command")
 #else
@@ -17,7 +17,7 @@ namespace PervasiveDigital.Hardware.SPWF04
             this.Actual = actual;
         }
 
-        public FailedExpectException(string expected, string actual)
+        public FailedExpectException(string[] expected, string actual)
 #if MF_FRAMEWORK
             : base("Unexpected response to a command")
 #else
@@ -29,7 +29,7 @@ namespace PervasiveDigital.Hardware.SPWF04
         }
 
         public string Command { get; private set; }
-        public string Expected { get; private set; }
+        public string[] Expected { get; private set; }
         public string Actual { get; private set; }
     }
 

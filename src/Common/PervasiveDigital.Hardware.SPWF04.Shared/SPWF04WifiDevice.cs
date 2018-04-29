@@ -26,9 +26,12 @@ namespace PervasiveDigital.Hardware.SPWF04
             // AT Commands
             ConfigCommand,
             EnableWifiCommand,
+            SetSsid,
 
             // Config values
             ConsoleEcho,
+            WifiPrivacyMode,
+            WpaPskPassword,
 
             ResetCommand,
             RestoreCommand,
@@ -71,7 +74,7 @@ namespace PervasiveDigital.Hardware.SPWF04
         private Hashtable _commandSet = new Hashtable();
         public delegate void WifiBootedEventHandler(object sender, EventArgs args);
         public delegate void WifiErrorEventHandler(object sender, EventArgs args);
-        public delegate void WifiConnectionStateEventHandler(object sender, EventArgs args);
+        public delegate void WifiConnectionStateEventHandler(object sender, bool connected);
         public delegate void ServerConnectionOpenedHandler(object sender, WifiSocket socket);
         public delegate void ProgressCallback(string progress);
 
@@ -100,8 +103,8 @@ namespace PervasiveDigital.Hardware.SPWF04
         public event WifiBootedEventHandler Booted;
         public event HardwareFaultHandler HardwareFault;
         //public event WifiErrorEventHandler Error;
-        //public event WifiConnectionStateEventHandler ConnectionStateChanged;
-
+        public event WifiConnectionStateEventHandler WifiConnectionStateChanged;
+        public event IndicationReceivedHandler IndicationReceived;
         private OutputPort _resetPin = null;
 
         public Spwf04WifiDevice(SerialPort port, OutputPort resetPin)
@@ -116,12 +119,27 @@ namespace PervasiveDigital.Hardware.SPWF04
             _device.DataReceived += OnDataReceived;
             _device.SocketClosed += OnSocketClosed;
             _device.SocketOpened += OnSocketOpened;
-            _device.Fault += OnEspFault;
+            _device.IndicationReceived += OnIndicationReceived;
+            _device.Fault += OnFault;
             _device.Start();
             ThreadPool.QueueUserWorkItem(BackgroundInitialize);
         }
 
-        private void OnEspFault(object sender, int cause)
+        private void OnIndicationReceived(object sender, int code, string details)
+        {
+            switch (code)
+            {
+                case 24:
+                case 38:
+                    if (this.WifiConnectionStateChanged != null)
+                        this.WifiConnectionStateChanged(this, code == 24);  //24==up, 38==down
+                    break;
+            }
+            if (this.IndicationReceived != null)
+                this.IndicationReceived(this, code, details);
+        }
+
+        private void OnFault(object sender, int cause)
         {
             if (this.HardwareFault != null)
                 this.HardwareFault(this, cause);
@@ -230,22 +248,35 @@ namespace PervasiveDigital.Hardware.SPWF04
             EnsureInitialized();
             lock (_oplock)
             {
-                _device.SendAndExpect(Command(Commands.EnableWifiCommand) + (fEnable ? "0" : "1"), OK);
+                // The radio will respond with error 17 if you try to turn it on when it is already on
+                // and with error 18 if you try to turn it off when it is already off.
+                _device.SendAndExpect(Command(Commands.EnableWifiCommand) + (fEnable ? "1" : "0"), new[] { OK, ErrorCode(17), ErrorCode(18) });
             }
         }
+
 
         /// <summary>
         /// Connect to an access point
         /// </summary>
         /// <param name="ssid">The SSID of the access point that you wish to connect to</param>
         /// <param name="password">The password for the access point that you wish to connect to</param>
-        public void Connect(string ssid, string password, bool persist = false)
+        public void Connect(string ssid, string password)
         {
             EnsureInitialized();
             lock (_oplock)
             {
-                var info = _device.SendAndReadUntil(Command(Commands.JoinAccessPointCommand, persist) + '"' + ssid + "\",\"" + password + '"', OK, JoinTimeout);
-                // We are going to ignore the returned address data (which varies for different firmware) and request address data from the chip in the property accessors
+                _device.SendAndExpect(Command(Commands.SetSsid) + ssid, OK);
+                if (!StringUtilities.IsNullOrEmpty(password))
+                    Configure(Commands.WpaPskPassword, password);
+            }
+        }
+
+        public void SetPrivacyMode(int mode)
+        {
+            EnsureInitialized();
+            lock (_oplock)
+            {
+                Configure(Commands.WifiPrivacyMode, mode.ToString());
             }
         }
 
@@ -541,7 +572,7 @@ namespace PervasiveDigital.Hardware.SPWF04
                         if (reply.IndexOf(ErrorReply) == 0)
                             throw new ErrorException(command);
                         else
-                            throw new FailedExpectException(Command(Commands.SessionStartCommand), ConnectReply, reply);
+                            throw new FailedExpectException(Command(Commands.SessionStartCommand), new[] { ConnectReply }, reply);
                     }
                     if (!success)
                         Thread.Sleep(500);
@@ -550,7 +581,7 @@ namespace PervasiveDigital.Hardware.SPWF04
                 {
                     if (reply.IndexOf(ConnectReply) == -1)
                         throw new DnsLookupFailedException(sock.Hostname);
-                    throw new FailedExpectException(Command(Commands.SessionStartCommand), ConnectReply, reply);
+                    throw new FailedExpectException(Command(Commands.SessionStartCommand), new[] { ConnectReply }, reply);
                 }
                 reply = reply.Substring(0, reply.IndexOf(','));
                 if (int.Parse(reply) != socket)
@@ -896,7 +927,6 @@ namespace PervasiveDigital.Hardware.SPWF04
                             {
                             }
                         } while (--pingRetries > 0 && !pingSuccess);
-                        // if after 10 retries, we're getting nowhere, then cycle the power
                         if (pingSuccess)
                             break;
                     }
@@ -931,10 +961,13 @@ namespace PervasiveDigital.Hardware.SPWF04
         {
             _commandSet[Commands.EnableWifiCommand] = "AT+S.WIFI="; // 0 or 1
             _commandSet[Commands.ConfigCommand] = "AT+S.SCFG=";
+            _commandSet[Commands.SetSsid] = "AT+S.SSIDTXT=";
 
             // config values
             _commandSet[Commands.ConsoleEcho] = "console_echo";
-
+            _commandSet[Commands.WifiPrivacyMode] = "wifi_priv_mode";
+            _commandSet[Commands.WpaPskPassword] = "wifi_wpa_psk_text";
+            
             //_commandSet40[Commands.EchoOffCommand] = "ATE0";
             //_commandSet40[Commands.ResetCommand] = "AT+RST";
             //_commandSet40[Commands.GetFirmwareVersionCommand] = "AT+GMR";
@@ -1008,6 +1041,11 @@ namespace PervasiveDigital.Hardware.SPWF04
             if (result == null)
                 throw new Exception("command not supported");
             return result;
+        }
+
+        private string ErrorCode(int code)
+        {
+            return "AT-S.ERROR:" + code + ":";
         }
 
         private string Response(Commands cmd, bool persist = false)
