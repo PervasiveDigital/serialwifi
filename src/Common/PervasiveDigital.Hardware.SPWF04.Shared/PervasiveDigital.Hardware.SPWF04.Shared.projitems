@@ -12,8 +12,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)AccessPoint.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AccessPointClient.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Ecn.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Esp8266Serial.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Esp8266WifiDevice.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SPWF04Serial.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SPWF04WifiDevice.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exceptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OperatingMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)WifiSocket.cs" />

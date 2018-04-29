@@ -7,7 +7,7 @@ namespace PervasiveDigital.Hardware.SPWF04
 {
     public class WifiSocket : ISocket, IDisposable
     {
-        private readonly Esp8266WifiDevice _parent;
+        private readonly Spwf04WifiDevice _parent;
         private readonly string _hostname;
         private readonly int _port;
         private readonly bool _fTcp;
@@ -16,7 +16,7 @@ namespace PervasiveDigital.Hardware.SPWF04
         public event SocketReceivedDataEventHandler DataReceived;
         public event SocketClosedEventHandler SocketClosed;
 
-        internal WifiSocket(Esp8266WifiDevice device, int iSocket, string hostname, int port, bool fTcp)
+        internal WifiSocket(Spwf04WifiDevice device, int iSocket, string hostname, int port, bool fTcp)
         {
             _parent = device;
             _iSocket = iSocket;
@@ -25,7 +25,7 @@ namespace PervasiveDigital.Hardware.SPWF04
             _fTcp = fTcp;
         }
 
-        internal WifiSocket(Esp8266WifiDevice device, int iSocket, int port)
+        internal WifiSocket(Spwf04WifiDevice device, int iSocket, int port)
         {
             _parent = device;
             _iSocket = iSocket;

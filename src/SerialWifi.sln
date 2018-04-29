@@ -116,6 +116,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "PervasiveDigital.Hardware.S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PervasiveDigital.Hardware.SPWF04.netmf44", "netmf44\PervasiveDigital.Hardware.SPWF04\PervasiveDigital.Hardware.SPWF04.netmf44.csproj", "{159F7838-732A-454A-A3C1-D1BD0CD28FC8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleSpwTest", "netmf44\Tests\SimpleSpwTest\SimpleSpwTest.csproj", "{8A3126C3-F29C-4512-9F76-2D03F3B7732D}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Common\PervasiveDigital.Hardware.ESP8266.Shared\PervasiveDigital.Hardware.ESP8266.Shared.projitems*{12e19b00-49ab-49cc-ac36-a534d61d65f2}*SharedItemsImports = 4
@@ -419,6 +421,24 @@ Global
 		{159F7838-732A-454A-A3C1-D1BD0CD28FC8}.Release|x64.Build.0 = Release|Any CPU
 		{159F7838-732A-454A-A3C1-D1BD0CD28FC8}.Release|x86.ActiveCfg = Release|Any CPU
 		{159F7838-732A-454A-A3C1-D1BD0CD28FC8}.Release|x86.Build.0 = Release|Any CPU
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D}.Debug|x64.Build.0 = Debug|Any CPU
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D}.Debug|x64.Deploy.0 = Debug|Any CPU
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D}.Debug|x86.Build.0 = Debug|Any CPU
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D}.Debug|x86.Deploy.0 = Debug|Any CPU
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D}.Release|x64.ActiveCfg = Release|Any CPU
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D}.Release|x64.Build.0 = Release|Any CPU
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D}.Release|x64.Deploy.0 = Release|Any CPU
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D}.Release|x86.ActiveCfg = Release|Any CPU
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D}.Release|x86.Build.0 = Release|Any CPU
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D}.Release|x86.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -458,5 +478,6 @@ Global
 		{DE47F8DA-B2B4-4229-98E6-310DCE46DD48} = {383A1129-B303-4F24-9A4D-EF8A90BAD4EE}
 		{947A3316-1947-4832-9DB6-F66A3FA7A418} = {B33BAB01-0854-4D5A-9B90-E4FC1156CFDA}
 		{159F7838-732A-454A-A3C1-D1BD0CD28FC8} = {3190C22A-CF74-4608-8258-E57578589088}
+		{8A3126C3-F29C-4512-9F76-2D03F3B7732D} = {383A1129-B303-4F24-9A4D-EF8A90BAD4EE}
 	EndGlobalSection
 EndGlobal

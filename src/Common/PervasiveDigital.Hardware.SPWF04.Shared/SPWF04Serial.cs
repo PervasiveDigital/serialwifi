@@ -10,7 +10,7 @@ namespace PervasiveDigital.Hardware.SPWF04
 {
     public delegate void HardwareFaultHandler(object sender, int cause);
 
-    internal class Esp8266Serial
+    internal class Spwf04Serial
     {
         public delegate void DataReceivedHandler(object sender, byte[] stream, int channel);
         public delegate void SocketOpenedHandler(object sender, int channel, out bool fHandled);
@@ -42,7 +42,7 @@ namespace PervasiveDigital.Hardware.SPWF04
         private bool _enableDebugOutput;
         private bool _enableVerboseOutput;
 
-        public Esp8266Serial(SerialPort port)
+        public Spwf04Serial(SerialPort port)
         {
             this.CommandTimeout = DefaultCommandTimeout;
             _port = port;

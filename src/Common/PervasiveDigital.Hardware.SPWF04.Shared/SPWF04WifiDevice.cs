@@ -11,60 +11,64 @@ using PervasiveDigital.Utilities;
 
 namespace PervasiveDigital.Hardware.SPWF04
 {
-    public class Esp8266WifiDevice : IWifiAdapter, IDisposable
+    public class Spwf04WifiDevice : IWifiAdapter, IDisposable
     {
         // The amount of time that we will search for 'OK' in response to joining an AP
         public const int JoinTimeout = 30000;
 
         private const string AT = "AT";
-        private const string OK = "OK";
+        private const string OK = "AT-S.OK";
         private const string ErrorReply = "ERROR";
         private const string ConnectReply = "CONNECT";
 
         public enum Commands
         {
-           EchoOffCommand,
-           ResetCommand,
-           RestoreCommand,
-           GetFirmwareVersionCommand,
-           SetOperatingModeCommand,
-           GetOperatingModeCommand,
-           GetOperatingModeResponse,
-           SetDhcpMode,
-           SetAccessPointModeCommand,
-           GetAccessPointModeCommand,
-           GetAccessPointModeResponse,
-           GetAddressInformationCommand,
-           SetStationAddressCommand,
-           GetStationAddressCommand,
-           GetStationAddressResponse,
-           SetApAddressCommand,
-           GetApAddressCommand,
-           GetApAddressResponse,
-           GetStationMacAddress,
-           GetStationMacAddressResponse,
-           SetStationMacAddress,
-           GetApMacAddress,
-           GetApMacAddressResponse,
-           SetApMacAddress,
-           ListAccessPointsCommand,
-           JoinAccessPointCommand,
-           QuitAccessPointCommand,
-           ListConnectedClientsCommand,
-           SleepCommand,
-           SetMuxModeCommand,
-           SessionStartCommand,
-           SessionEndCommand,
-           ServerCommand,
-           UpdateCommand,
-           LinkedReply,
-           SendCommand,
-           SendCommandReply,
-           ConnectReply,
+            // AT Commands
+            ConfigCommand,
+            EnableWifiCommand,
+
+            // Config values
+            ConsoleEcho,
+
+            ResetCommand,
+            RestoreCommand,
+            GetFirmwareVersionCommand,
+            SetOperatingModeCommand,
+            GetOperatingModeCommand,
+            GetOperatingModeResponse,
+            SetDhcpMode,
+            SetAccessPointModeCommand,
+            GetAccessPointModeCommand,
+            GetAccessPointModeResponse,
+            GetAddressInformationCommand,
+            SetStationAddressCommand,
+            GetStationAddressCommand,
+            GetStationAddressResponse,
+            SetApAddressCommand,
+            GetApAddressCommand,
+            GetApAddressResponse,
+            GetStationMacAddress,
+            GetStationMacAddressResponse,
+            SetStationMacAddress,
+            GetApMacAddress,
+            GetApMacAddressResponse,
+            SetApMacAddress,
+            ListAccessPointsCommand,
+            JoinAccessPointCommand,
+            QuitAccessPointCommand,
+            ListConnectedClientsCommand,
+            SleepCommand,
+            SessionStartCommand,
+            SessionEndCommand,
+            ServerCommand,
+            UpdateCommand,
+            LinkedReply,
+            SendCommand,
+            SendCommandReply,
+            ConnectReply,
         }
 
-        private Hashtable _commandSet40 = new Hashtable();
-        private Hashtable _commandSet51 = new Hashtable();
+        private Hashtable _commandSet = new Hashtable();
         public delegate void WifiBootedEventHandler(object sender, EventArgs args);
         public delegate void WifiErrorEventHandler(object sender, EventArgs args);
         public delegate void WifiConnectionStateEventHandler(object sender, EventArgs args);
@@ -75,7 +79,7 @@ namespace PervasiveDigital.Hardware.SPWF04
         private readonly WifiSocket[] _sockets = new WifiSocket[4];
         private ServerConnectionOpenedHandler _onServerConnectionOpenedHandler;
         private int _inboundPort = -1;
-        private Esp8266Serial _esp;
+        private Spwf04Serial _device;
         private int _lastSocketUsed = 0;
         private bool _enableDebugOutput;
         private bool _enableVerboseOutput;
@@ -98,31 +102,22 @@ namespace PervasiveDigital.Hardware.SPWF04
         //public event WifiErrorEventHandler Error;
         //public event WifiConnectionStateEventHandler ConnectionStateChanged;
 
-        private OutputPort _powerPin = null;
         private OutputPort _resetPin = null;
 
-        private enum Protocols
+        public Spwf04WifiDevice(SerialPort port, OutputPort resetPin)
         {
-            Protocol_40,
-            Protocol_51,
-        }
-        private Protocols _protocol;
-
-        public Esp8266WifiDevice(SerialPort port, OutputPort powerPin, OutputPort resetPin)
-        {
-            _powerPin = powerPin;
             _resetPin = resetPin;
             Initialize(port);
         }
 
         private void Initialize(SerialPort port)
         {
-            _esp = new Esp8266Serial(port);
-            _esp.DataReceived += OnDataReceived;
-            _esp.SocketClosed += OnSocketClosed;
-            _esp.SocketOpened += _esp_SocketOpened;
-            _esp.Fault += OnEspFault;
-            _esp.Start();
+            _device = new Spwf04Serial(port);
+            _device.DataReceived += OnDataReceived;
+            _device.SocketClosed += OnSocketClosed;
+            _device.SocketOpened += OnSocketOpened;
+            _device.Fault += OnEspFault;
+            _device.Start();
             ThreadPool.QueueUserWorkItem(BackgroundInitialize);
         }
 
@@ -142,7 +137,7 @@ namespace PervasiveDigital.Hardware.SPWF04
             set
             {
                 _enableDebugOutput = value;
-                _esp.EnableDebugOutput = value;
+                _device.EnableDebugOutput = value;
             }
         }
 
@@ -152,14 +147,14 @@ namespace PervasiveDigital.Hardware.SPWF04
             set
             {
                 _enableVerboseOutput = value;
-                _esp.EnableVerboseOutput = value;
+                _device.EnableVerboseOutput = value;
             }
         }
 
         // Use this to make sure no one else interrupts your sequence of interactions with the esp hardware block.
         public object OperationLock
         {
-            get {  return _oplock; }
+            get { return _oplock; }
         }
 
         public void Reset(bool force)
@@ -171,10 +166,10 @@ namespace PervasiveDigital.Hardware.SPWF04
                 int retries = 0;
                 while (true)
                 {
-                    _esp.SendAndReadUntil(Command(Commands.ResetCommand), OK);
+                    _device.SendAndReadUntil(Command(Commands.ResetCommand), OK);
                     try
                     {
-                        _esp.Find("ready", 20000);
+                        _device.Find("ready", 20000);
                         break;
                     }
                     catch
@@ -192,7 +187,7 @@ namespace PervasiveDigital.Hardware.SPWF04
             EnsureInitialized();
             lock (_oplock)
             {
-                _esp.SendAndReadUntil(Command(Commands.RestoreCommand), OK);
+                _device.SendAndReadUntil(Command(Commands.RestoreCommand), OK);
             }
         }
 
@@ -204,20 +199,20 @@ namespace PervasiveDigital.Hardware.SPWF04
         public void Update(ProgressCallback callback)
         {
             EnsureInitialized();
-            lock(_oplock)
+            lock (_oplock)
             {
-                _esp.SendCommand(Command(Commands.UpdateCommand));
+                _device.SendCommand(Command(Commands.UpdateCommand));
                 while (true)
                 {
                     // Use a very long timeout - this can take a while - currently, a five minute timeout, 
                     //   but you really don't want to time-out this call and maybe cause the user to do 
                     //   something silly like power down the chip while it is updating.
-                    var reply = _esp.GetReplyWithTimeout(300000);
+                    var reply = _device.GetReplyWithTimeout(300000);
                     if (reply == OK)
                         break;
                     else
                     {
-                        if (callback!=null)
+                        if (callback != null)
                             callback(reply);
                         if (reply == ErrorReply)
                         {
@@ -227,6 +222,15 @@ namespace PervasiveDigital.Hardware.SPWF04
                 }
                 Reset(false);
                 BackgroundInitialize(null);
+            }
+        }
+
+        public void EnableWifi(bool fEnable)
+        {
+            EnsureInitialized();
+            lock (_oplock)
+            {
+                _device.SendAndExpect(Command(Commands.EnableWifiCommand) + (fEnable ? "0" : "1"), OK);
             }
         }
 
@@ -240,7 +244,7 @@ namespace PervasiveDigital.Hardware.SPWF04
             EnsureInitialized();
             lock (_oplock)
             {
-                var info = _esp.SendAndReadUntil(Command(Commands.JoinAccessPointCommand, persist) + '"' + ssid + "\",\"" + password + '"', OK, JoinTimeout);
+                var info = _device.SendAndReadUntil(Command(Commands.JoinAccessPointCommand, persist) + '"' + ssid + "\",\"" + password + '"', OK, JoinTimeout);
                 // We are going to ignore the returned address data (which varies for different firmware) and request address data from the chip in the property accessors
             }
         }
@@ -250,7 +254,7 @@ namespace PervasiveDigital.Hardware.SPWF04
             EnsureInitialized();
             lock (_oplock)
             {
-                _esp.SendAndExpect(Command(Commands.QuitAccessPointCommand), OK);
+                _device.SendAndExpect(Command(Commands.QuitAccessPointCommand), OK);
             }
         }
 
@@ -259,7 +263,7 @@ namespace PervasiveDigital.Hardware.SPWF04
             EnsureInitialized();
             lock (_oplock)
             {
-                _esp.SendAndExpect(Command(Commands.ServerCommand) + "1," + port, OK);
+                _device.SendAndExpect(Command(Commands.ServerCommand) + "1," + port, OK);
                 _inboundPort = port;
                 _onServerConnectionOpenedHandler = onServerConnectionOpenedHandler;
             }
@@ -283,7 +287,7 @@ namespace PervasiveDigital.Hardware.SPWF04
             EnsureInitialized();
             lock (_oplock)
             {
-                _esp.SendAndExpect(Command(Commands.SleepCommand) + timeInMs.ToString(), OK);
+                _device.SendAndExpect(Command(Commands.SleepCommand) + timeInMs.ToString(), OK);
             }
         }
 
@@ -298,10 +302,10 @@ namespace PervasiveDigital.Hardware.SPWF04
             OperatingMode result = OperatingMode.Unknown;
             lock (_oplock)
             {
-                var info = _esp.SendAndReadUntil(Command(Commands.GetOperatingModeCommand), OK);
+                var info = _device.SendAndReadUntil(Command(Commands.GetOperatingModeCommand), OK);
                 foreach (var line in info)
                 {
-                    if (line.IndexOf(Response(Commands.GetOperatingModeResponse))==0)
+                    if (line.IndexOf(Response(Commands.GetOperatingModeResponse)) == 0)
                     {
                         var arg = Unquote(line.Substring(line.IndexOf(':') + 1));
                         switch (arg.Trim())
@@ -342,7 +346,7 @@ namespace PervasiveDigital.Hardware.SPWF04
                         arg = 3;
                         break;
                 }
-                _esp.SendAndExpect(Command(Commands.SetOperatingModeCommand, persist) + arg, OK);
+                _device.SendAndExpect(Command(Commands.SetOperatingModeCommand, persist) + arg, OK);
                 // Reset the chip
                 //Reset(false);
             }
@@ -364,10 +368,10 @@ namespace PervasiveDigital.Hardware.SPWF04
             EnsureInitialized();
             lock (_oplock)
             {
-                _esp.SendAndExpect(Command(Commands.SetAccessPointModeCommand, persist) + 
+                _device.SendAndExpect(Command(Commands.SetAccessPointModeCommand, persist) +
                     '"' + ssid + "\"," +
-                    '"' + password + "\"," + 
-                    channel + "," + 
+                    '"' + password + "\"," +
+                    channel + "," +
                     (int)ecn, OK);
             }
         }
@@ -379,7 +383,7 @@ namespace PervasiveDigital.Hardware.SPWF04
                 EnsureInitialized();
                 lock (_oplock)
                 {
-                    var info = _esp.SendAndReadUntil(Command(Commands.GetAccessPointModeCommand), OK);
+                    var info = _device.SendAndReadUntil(Command(Commands.GetAccessPointModeCommand), OK);
                     foreach (var line in info)
                     {
                         if (line.IndexOf(Response(Commands.GetAccessPointModeResponse)) == 0)
@@ -400,7 +404,7 @@ namespace PervasiveDigital.Hardware.SPWF04
                 EnsureInitialized();
                 lock (_oplock)
                 {
-                    var info = _esp.SendAndReadUntil(Command(Commands.GetAccessPointModeCommand), OK);
+                    var info = _device.SendAndReadUntil(Command(Commands.GetAccessPointModeCommand), OK);
                     foreach (var line in info)
                     {
                         if (line.IndexOf(Response(Commands.GetAccessPointModeResponse)) == 0)
@@ -421,7 +425,7 @@ namespace PervasiveDigital.Hardware.SPWF04
                 EnsureInitialized();
                 lock (_oplock)
                 {
-                    var info = _esp.SendAndReadUntil(Command(Commands.GetAccessPointModeCommand), OK);
+                    var info = _device.SendAndReadUntil(Command(Commands.GetAccessPointModeCommand), OK);
                     foreach (var line in info)
                     {
                         if (line.IndexOf(Response(Commands.GetAccessPointModeResponse)) == 0)
@@ -442,7 +446,7 @@ namespace PervasiveDigital.Hardware.SPWF04
                 EnsureInitialized();
                 lock (_oplock)
                 {
-                    var info = _esp.SendAndReadUntil(Command(Commands.GetAccessPointModeCommand), OK);
+                    var info = _device.SendAndReadUntil(Command(Commands.GetAccessPointModeCommand), OK);
                     foreach (var line in info)
                     {
                         if (line.IndexOf(Response(Commands.GetAccessPointModeResponse)) == 0)
@@ -459,7 +463,7 @@ namespace PervasiveDigital.Hardware.SPWF04
         public void EnableDhcp(OperatingMode mode, bool enable, bool persist = false)
         {
             if (mode == OperatingMode.Unknown)
-                throw new ArgumentException("Invalid value","mode");
+                throw new ArgumentException("Invalid value", "mode");
             EnsureInitialized();
             lock (_oplock)
             {
@@ -477,7 +481,7 @@ namespace PervasiveDigital.Hardware.SPWF04
                         break;
 
                 }
-                _esp.SendAndExpect(Command(Commands.SetDhcpMode, persist) + arg + ',' + (enable ? '1' : '0'), OK);
+                _device.SendAndExpect(Command(Commands.SetDhcpMode, persist) + arg + ',' + (enable ? '1' : '0'), OK);
             }
         }
 
@@ -490,7 +494,7 @@ namespace PervasiveDigital.Hardware.SPWF04
                 // lastSocketUsed is used to make sure that we don't reuse a just-released socket too quickly
                 // It can still happen, but this reduces the probability of it happening if you are using less than five sockets in quick succession.
                 // The chip seems to get upset if we reuse a socket immediately after closing it.
-                for (int i = _lastSocketUsed ; i < _sockets.Length; ++i)
+                for (int i = _lastSocketUsed; i < _sockets.Length; ++i)
                 {
                     if (_sockets[i] == null)
                     {
@@ -527,7 +531,7 @@ namespace PervasiveDigital.Hardware.SPWF04
                     var command = Command(Commands.SessionStartCommand) + socket + ',' +
                                                      (sock.UseTcp ? "\"TCP\",\"" : "\"UDP\",\"") + sock.Hostname + "\"," +
                                                      sock.Port;
-                    reply = _esp.SendCommandAndReadReply(command);
+                    reply = _device.SendCommandAndReadReply(command);
                     if (reply.ToLower().IndexOf("dns fail") != -1)
                     {
                         success = false; // a retriable failure
@@ -571,7 +575,7 @@ namespace PervasiveDigital.Hardware.SPWF04
             {
                 if (socket >= 0 && socket <= _sockets.Length)
                 {
-                    _esp.SendAndExpect(Command(Commands.SessionEndCommand) + socket, OK);
+                    _device.SendAndExpect(Command(Commands.SessionEndCommand) + socket, OK);
                 }
             }
         }
@@ -581,27 +585,9 @@ namespace PervasiveDigital.Hardware.SPWF04
             EnsureInitialized();
             lock (_oplock)
             {
-                _esp.SendAndExpect(Command(Commands.SendCommand) + iSocket + ',' + payload.Length, OK);
-                _esp.Write(payload);
-                _esp.Find(Response(Commands.SendCommandReply));
-            }
-        }
-
-        public void SetPower(bool state)
-        {
-            if (_powerPin == null)
-                return;
-
-            lock (_oplock)
-            {
-                _powerPin.Write(state);
-                // if the power just came back on, we need to re-init
-                if (state)
-                {
-                    Thread.Sleep(500);
-                    _isInitializedEvent.Reset();
-                    BackgroundInitialize(null);
-                }
+                _device.SendAndExpect(Command(Commands.SendCommand) + iSocket + ',' + payload.Length, OK);
+                _device.Write(payload);
+                _device.Find(Response(Commands.SendCommandReply));
             }
         }
 
@@ -611,21 +597,21 @@ namespace PervasiveDigital.Hardware.SPWF04
         }
 
         public IPAddress GetStationIPAddress()
-        { 
+        {
             EnsureInitialized();
             lock (_oplock)
             {
                 GetStationAddressInfo();
             }
-            return _stationAddress; 
+            return _stationAddress;
         }
 
         public void SetStationIPAddress(IPAddress value, bool persist = false)
-        { 
+        {
             EnsureInitialized();
             lock (_oplock)
             {
-                _esp.SendAndExpect(Command(Commands.SetStationAddressCommand, persist) + '"' + value.ToString() + '"', OK);
+                _device.SendAndExpect(Command(Commands.SetStationAddressCommand, persist) + '"' + value.ToString() + '"', OK);
             }
         }
 
@@ -645,13 +631,13 @@ namespace PervasiveDigital.Hardware.SPWF04
         }
 
         public IPAddress GetAccessPointIPAddress()
-        { 
+        {
             EnsureInitialized();
             lock (_oplock)
             {
                 GetApAddressInfo();
             }
-            return _apAddress; 
+            return _apAddress;
         }
 
         public void SetAccessPointIPAddress(IPAddress value, bool persist = false)
@@ -659,7 +645,7 @@ namespace PervasiveDigital.Hardware.SPWF04
             EnsureInitialized();
             lock (_oplock)
             {
-                _esp.SendAndExpect(Command(Commands.SetApAddressCommand, persist) + '"' + value.ToString() + '"', OK);
+                _device.SendAndExpect(Command(Commands.SetApAddressCommand, persist) + '"' + value.ToString() + '"', OK);
             }
         }
 
@@ -684,7 +670,7 @@ namespace PervasiveDigital.Hardware.SPWF04
                 {
                     if (line.StartsWith("AT version:"))
                     {
-                        return line.Substring(line.IndexOf(':')+1);
+                        return line.Substring(line.IndexOf(':') + 1);
                     }
                 }
                 return null;
@@ -699,7 +685,7 @@ namespace PervasiveDigital.Hardware.SPWF04
                 {
                     if (line.StartsWith("SDK version:"))
                     {
-                        return line.Substring(line.IndexOf(':')+1);
+                        return line.Substring(line.IndexOf(':') + 1);
                     }
                 }
                 return null;
@@ -714,7 +700,7 @@ namespace PervasiveDigital.Hardware.SPWF04
                 {
                     if (line.StartsWith("compile time:"))
                     {
-                        return line.Substring(line.IndexOf(':')+1);
+                        return line.Substring(line.IndexOf(':') + 1);
                     }
                 }
                 return null;
@@ -731,7 +717,7 @@ namespace PervasiveDigital.Hardware.SPWF04
             EnsureInitialized();
             lock (_oplock)
             {
-                var info = _esp.SendAndReadUntil(Command(Commands.GetStationMacAddress), OK);
+                var info = _device.SendAndReadUntil(Command(Commands.GetStationMacAddress), OK);
                 foreach (var line in info)
                 {
                     ParseAddressInfo(line);
@@ -741,11 +727,11 @@ namespace PervasiveDigital.Hardware.SPWF04
         }
 
         public void SetStationMacAddress(string value, bool persist = false)
-        { 
+        {
             EnsureInitialized();
             lock (_oplock)
             {
-                _esp.SendAndExpect(Command(Commands.SetStationMacAddress, persist) + '"' + value + '"', OK);
+                _device.SendAndExpect(Command(Commands.SetStationMacAddress, persist) + '"' + value + '"', OK);
             }
         }
 
@@ -759,7 +745,7 @@ namespace PervasiveDigital.Hardware.SPWF04
             EnsureInitialized();
             lock (_oplock)
             {
-                var info = _esp.SendAndReadUntil(Command(Commands.GetApMacAddress), OK);
+                var info = _device.SendAndReadUntil(Command(Commands.GetApMacAddress), OK);
                 foreach (var line in info)
                 {
                     ParseAddressInfo(line);
@@ -773,7 +759,7 @@ namespace PervasiveDigital.Hardware.SPWF04
             EnsureInitialized();
             lock (_oplock)
             {
-                _esp.SendAndExpect(Command(Commands.SetApMacAddress, persist) + '"' + value + '"', OK);
+                _device.SendAndExpect(Command(Commands.SetApMacAddress, persist) + '"' + value + '"', OK);
             }
         }
 
@@ -787,14 +773,14 @@ namespace PervasiveDigital.Hardware.SPWF04
                 //if (this.Mode != OperatingMode.Station)
                 //    throw new Exception("You must be in 'Station' mode to retrieve access points.");
 
-                var response = _esp.SendAndReadUntil(Command(Commands.ListAccessPointsCommand), OK);
+                var response = _device.SendAndReadUntil(Command(Commands.ListAccessPointsCommand), OK);
                 foreach (var line in response)
                 {
                     var info = Unquote(line.Substring(line.IndexOf(':') + 1));
                     var tokens = info.Split(',');
                     if (tokens.Length >= 4)
                     {
-                        var ecn = (Ecn) byte.Parse(tokens[0]);
+                        var ecn = (Ecn)byte.Parse(tokens[0]);
                         var ssid = tokens[1];
                         var rssi = int.Parse(tokens[2]);
                         var mac = tokens[3];
@@ -815,7 +801,7 @@ namespace PervasiveDigital.Hardware.SPWF04
             EnsureInitialized();
             lock (_oplock)
             {
-                var response = _esp.SendAndReadUntil(Command(Commands.ListConnectedClientsCommand), OK);
+                var response = _device.SendAndReadUntil(Command(Commands.ListConnectedClientsCommand), OK);
                 foreach (var line in response)
                 {
                     if (line != null && line.Length > 0)
@@ -855,11 +841,11 @@ namespace PervasiveDigital.Hardware.SPWF04
             }
         }
 
-        void _esp_SocketOpened(object sender, int channel, out bool fHandled)
+        void OnSocketOpened(object sender, int channel, out bool fHandled)
         {
             // This could be the result of an outgoing or incoming socket connection
 
-            if (_onServerConnectionOpenedHandler==null || _sockets[channel]!=null)
+            if (_onServerConnectionOpenedHandler == null || _sockets[channel] != null)
             {
                 fHandled = false;
                 return;
@@ -886,29 +872,20 @@ namespace PervasiveDigital.Hardware.SPWF04
             lock (_oplock)
             {
                 // start with the least common denominator command set
-                _protocol = Protocols.Protocol_40;
                 InitializeCommandSet();
-                
+
                 bool success = false;
                 do
                 {
                     while (true)
                     {
-                        if (_powerPin!=null && !_powerPin.Read())
-                        {
-                            Thread.Sleep(2000);
-                            // Don't use SetPower - it will trigger a recursion into BackgroundInitialize
-                            _powerPin.Write(true);
-                            Thread.Sleep(2000);
-                        }
-
                         bool pingSuccess = false;
                         int pingRetries = 10;
                         do
                         {
                             try
                             {
-                                _esp.SendAndExpect(AT, OK, 1000);
+                                _device.SendAndExpect(AT, OK, 1000);
                                 pingSuccess = true;
                             }
                             catch (FailedExpectException)
@@ -922,28 +899,19 @@ namespace PervasiveDigital.Hardware.SPWF04
                         // if after 10 retries, we're getting nowhere, then cycle the power
                         if (pingSuccess)
                             break;
-                        if (_powerPin!=null)
-                            _powerPin.Write(false);
                     }
 
                     success = false;
                     try
                     {
-                        _esp.SendAndExpect(Command(Commands.EchoOffCommand), OK, 2000);
+                        Configure(Commands.ConsoleEcho, "0");
 
-                        SetMuxMode(true);
-
-                        // Get the firmware version information
-                        this.Version = _esp.SendAndReadUntil(Command(Commands.GetFirmwareVersionCommand), OK);
-
-                        if (this.AtProtocolVersion.StartsWith("0.51"))
-                            _protocol = Protocols.Protocol_51;
-                        else
-                            _protocol = Protocols.Protocol_40;
+                        //// Get the firmware version information
+                        //this.Version = _device.SendAndReadUntil(Command(Commands.GetFirmwareVersionCommand), OK);
 
                         _isInitializedEvent.Set();
                         success = true;
-                        if (this.Booted!=null)
+                        if (this.Booted != null)
                             this.Booted.Invoke(this, new EventArgs());
                     }
                     catch (Exception)
@@ -961,93 +929,90 @@ namespace PervasiveDigital.Hardware.SPWF04
 
         private void InitializeCommandSet()
         {
-            _commandSet40[Commands.EchoOffCommand] = "ATE0";
-            _commandSet40[Commands.ResetCommand] = "AT+RST";
-            _commandSet40[Commands.GetFirmwareVersionCommand] = "AT+GMR";
-            _commandSet40[Commands.SetOperatingModeCommand] = "AT+CWMODE=";
-            _commandSet40[Commands.GetOperatingModeCommand] = "AT+CWMODE?";
-            _commandSet40[Commands.GetOperatingModeResponse] = "+CWMODE:";
-            _commandSet40[Commands.SetDhcpMode] = "AT+CWDHCP=";
-            _commandSet40[Commands.SetAccessPointModeCommand] = "AT+CWSAP=";
-            _commandSet40[Commands.GetAccessPointModeCommand] = "AT+CWSAP?";
-            _commandSet40[Commands.GetAccessPointModeResponse] = "+CWSAP:";
-            _commandSet40[Commands.GetAddressInformationCommand] = "AT+CIFSR";
-            _commandSet40[Commands.SetStationAddressCommand] = "AT+CIPSTA=";
-            _commandSet40[Commands.GetStationAddressCommand] = "AT+CIPSTA?";
-            _commandSet40[Commands.GetStationAddressResponse] = "+CIPSTA:";
-            _commandSet40[Commands.SetApAddressCommand] = "AT+CIPAP=";
-            _commandSet40[Commands.GetApAddressCommand] = "AT+CIPAP?";
-            _commandSet40[Commands.GetApAddressResponse] = "+CIPAP:";
-            _commandSet40[Commands.GetStationMacAddress] = "AT+CIPSTAMAC?";
-            _commandSet40[Commands.GetStationMacAddressResponse] = "+CIPSTAMAC:";
-            _commandSet40[Commands.SetStationMacAddress] = "AT+CIPSTAMAC=";
-            _commandSet40[Commands.GetApMacAddress] = "AT+CIPAPMAC?";
-            _commandSet40[Commands.GetApMacAddressResponse] = "+CIPAPMAC:";
-            _commandSet40[Commands.SetApMacAddress] = "AT+CIPAPMAC=";
-            _commandSet40[Commands.ListAccessPointsCommand] = "AT+CWLAP";
-            _commandSet40[Commands.JoinAccessPointCommand] = "AT+CWJAP=";
-            _commandSet40[Commands.QuitAccessPointCommand] = "AT+CWQAP";
-            _commandSet40[Commands.ListConnectedClientsCommand] = "AT+CWLIF";
-            _commandSet40[Commands.SleepCommand] = "AT+GSLP=";
-            _commandSet40[Commands.SetMuxModeCommand] = "AT+CIPMUX=";
-            _commandSet40[Commands.SessionStartCommand] = "AT+CIPSTART=";
-            _commandSet40[Commands.SessionEndCommand] = "AT+CIPCLOSE=";
-            _commandSet40[Commands.ServerCommand] = "AT+CIPSERVER=";
-            _commandSet40[Commands.UpdateCommand] = "AT+CIUPDATE";
-            _commandSet40[Commands.LinkedReply] = "Linked";
-            _commandSet40[Commands.SendCommand] = "AT+CIPSEND=";
-            _commandSet40[Commands.SendCommandReply] = "SEND OK";
+            _commandSet[Commands.EnableWifiCommand] = "AT+S.WIFI="; // 0 or 1
+            _commandSet[Commands.ConfigCommand] = "AT+S.SCFG=";
 
-            _commandSet51[Commands.RestoreCommand] = new[] { "AT+RESTORE", "AT+RESTORE" };
-            _commandSet51[Commands.SetOperatingModeCommand] = new[] { "AT+CWMODE_CUR=", "AT+CWMODE_DEF=" };
-            _commandSet51[Commands.GetOperatingModeCommand] = new[] { "AT+CWMODE_CUR?", "AT+CWMODE_DEF?" };
-            _commandSet51[Commands.GetOperatingModeResponse] = new[] { "+CWMODE_CUR:", "+CWMODE_DEF:" };
-            _commandSet51[Commands.SetDhcpMode] = new[] { "AT+CWDHCP_CUR=", "AT+CWDHCP_DEF=" };
-            _commandSet51[Commands.GetAccessPointModeCommand] = new[] { "AT+CWSAP_CUR?", "AT+CWSAP_DEF?" };
-            _commandSet51[Commands.SetAccessPointModeCommand] = new[] { "AT+CWSAP_CUR=", "AT+CWSAP_DEF=" };
-            _commandSet51[Commands.GetAccessPointModeResponse] = new[] { "+CWSAP_CUR:", "+CWSAP_DEF:" };
-            _commandSet51[Commands.SetStationAddressCommand] = new[] { "AT+CIPSTA_CUR=", "AT+CIPSTA_DEF=" };
-            _commandSet51[Commands.GetStationAddressCommand] = new[] { "AT+CIPSTA_CUR?", "AT+CIPSTA_DEF?" };
-            _commandSet51[Commands.GetStationAddressResponse] = new[] { "+CIPSTA_CUR:", "+CIPSTA_DEF:" };
-            _commandSet51[Commands.SetApAddressCommand] = new[] { "AT+CIPAP_CUR=", "AT+CIPAP_DEF=" };
-            _commandSet51[Commands.GetApAddressCommand] = new[] { "AT+CIPAP_CUR?", "AT+CIPAP_DEF?" };
-            _commandSet51[Commands.GetApAddressResponse] = new[] { "+CIPAP_CUR:", "+CIPAP_DEF:" };
-            _commandSet51[Commands.SetStationMacAddress] = new[] { "AT+CIPSTAMAC_CUR=", "AT+CIPSTAMAC_DEF=" };
-            _commandSet51[Commands.GetStationMacAddress] = new[] { "AT+CIPSTAMAC_CUR?", "AT+CIPSTAMAC_DEF?" };
-            _commandSet51[Commands.GetStationMacAddressResponse] = new[] { "+CIPSTAMAC_CUR:", "+CIPSTAMAC_DEF:" };
-            _commandSet51[Commands.SetApMacAddress] = new[] { "AT+CIPAPMAC_CUR=", "AT+CIPAPMAC_DEF=" };
-            _commandSet51[Commands.GetApMacAddress] = new[] { "AT+CIPAPMAC_CUR?", "AT+CIPAPMAC_DEF?" };
-            _commandSet51[Commands.GetApMacAddressResponse] = new[] { "+CIPAPMAC_CUR:", "+CIPAPMAC_DEF:" };
-            _commandSet51[Commands.JoinAccessPointCommand] = new[] { "AT+CWJAP_CUR=", "AT+CWJAP_DEF=" };
+            // config values
+            _commandSet[Commands.ConsoleEcho] = "console_echo";
+
+            //_commandSet40[Commands.EchoOffCommand] = "ATE0";
+            //_commandSet40[Commands.ResetCommand] = "AT+RST";
+            //_commandSet40[Commands.GetFirmwareVersionCommand] = "AT+GMR";
+            //_commandSet40[Commands.SetOperatingModeCommand] = "AT+CWMODE=";
+            //_commandSet40[Commands.GetOperatingModeCommand] = "AT+CWMODE?";
+            //_commandSet40[Commands.GetOperatingModeResponse] = "+CWMODE:";
+            //_commandSet40[Commands.SetDhcpMode] = "AT+CWDHCP=";
+            //_commandSet40[Commands.SetAccessPointModeCommand] = "AT+CWSAP=";
+            //_commandSet40[Commands.GetAccessPointModeCommand] = "AT+CWSAP?";
+            //_commandSet40[Commands.GetAccessPointModeResponse] = "+CWSAP:";
+            //_commandSet40[Commands.GetAddressInformationCommand] = "AT+CIFSR";
+            //_commandSet40[Commands.SetStationAddressCommand] = "AT+CIPSTA=";
+            //_commandSet40[Commands.GetStationAddressCommand] = "AT+CIPSTA?";
+            //_commandSet40[Commands.GetStationAddressResponse] = "+CIPSTA:";
+            //_commandSet40[Commands.SetApAddressCommand] = "AT+CIPAP=";
+            //_commandSet40[Commands.GetApAddressCommand] = "AT+CIPAP?";
+            //_commandSet40[Commands.GetApAddressResponse] = "+CIPAP:";
+            //_commandSet40[Commands.GetStationMacAddress] = "AT+CIPSTAMAC?";
+            //_commandSet40[Commands.GetStationMacAddressResponse] = "+CIPSTAMAC:";
+            //_commandSet40[Commands.SetStationMacAddress] = "AT+CIPSTAMAC=";
+            //_commandSet40[Commands.GetApMacAddress] = "AT+CIPAPMAC?";
+            //_commandSet40[Commands.GetApMacAddressResponse] = "+CIPAPMAC:";
+            //_commandSet40[Commands.SetApMacAddress] = "AT+CIPAPMAC=";
+            //_commandSet40[Commands.ListAccessPointsCommand] = "AT+CWLAP";
+            //_commandSet40[Commands.JoinAccessPointCommand] = "AT+CWJAP=";
+            //_commandSet40[Commands.QuitAccessPointCommand] = "AT+CWQAP";
+            //_commandSet40[Commands.ListConnectedClientsCommand] = "AT+CWLIF";
+            //_commandSet40[Commands.SleepCommand] = "AT+GSLP=";
+            //_commandSet40[Commands.SessionStartCommand] = "AT+CIPSTART=";
+            //_commandSet40[Commands.SessionEndCommand] = "AT+CIPCLOSE=";
+            //_commandSet40[Commands.ServerCommand] = "AT+CIPSERVER=";
+            //_commandSet40[Commands.UpdateCommand] = "AT+CIUPDATE";
+            //_commandSet40[Commands.LinkedReply] = "Linked";
+            //_commandSet40[Commands.SendCommand] = "AT+CIPSEND=";
+            //_commandSet40[Commands.SendCommandReply] = "SEND OK";
+
+            //_commandSet51[Commands.RestoreCommand] = new[] { "AT+RESTORE", "AT+RESTORE" };
+            //_commandSet51[Commands.SetOperatingModeCommand] = new[] { "AT+CWMODE_CUR=", "AT+CWMODE_DEF=" };
+            //_commandSet51[Commands.GetOperatingModeCommand] = new[] { "AT+CWMODE_CUR?", "AT+CWMODE_DEF?" };
+            //_commandSet51[Commands.GetOperatingModeResponse] = new[] { "+CWMODE_CUR:", "+CWMODE_DEF:" };
+            //_commandSet51[Commands.SetDhcpMode] = new[] { "AT+CWDHCP_CUR=", "AT+CWDHCP_DEF=" };
+            //_commandSet51[Commands.GetAccessPointModeCommand] = new[] { "AT+CWSAP_CUR?", "AT+CWSAP_DEF?" };
+            //_commandSet51[Commands.SetAccessPointModeCommand] = new[] { "AT+CWSAP_CUR=", "AT+CWSAP_DEF=" };
+            //_commandSet51[Commands.GetAccessPointModeResponse] = new[] { "+CWSAP_CUR:", "+CWSAP_DEF:" };
+            //_commandSet51[Commands.SetStationAddressCommand] = new[] { "AT+CIPSTA_CUR=", "AT+CIPSTA_DEF=" };
+            //_commandSet51[Commands.GetStationAddressCommand] = new[] { "AT+CIPSTA_CUR?", "AT+CIPSTA_DEF?" };
+            //_commandSet51[Commands.GetStationAddressResponse] = new[] { "+CIPSTA_CUR:", "+CIPSTA_DEF:" };
+            //_commandSet51[Commands.SetApAddressCommand] = new[] { "AT+CIPAP_CUR=", "AT+CIPAP_DEF=" };
+            //_commandSet51[Commands.GetApAddressCommand] = new[] { "AT+CIPAP_CUR?", "AT+CIPAP_DEF?" };
+            //_commandSet51[Commands.GetApAddressResponse] = new[] { "+CIPAP_CUR:", "+CIPAP_DEF:" };
+            //_commandSet51[Commands.SetStationMacAddress] = new[] { "AT+CIPSTAMAC_CUR=", "AT+CIPSTAMAC_DEF=" };
+            //_commandSet51[Commands.GetStationMacAddress] = new[] { "AT+CIPSTAMAC_CUR?", "AT+CIPSTAMAC_DEF?" };
+            //_commandSet51[Commands.GetStationMacAddressResponse] = new[] { "+CIPSTAMAC_CUR:", "+CIPSTAMAC_DEF:" };
+            //_commandSet51[Commands.SetApMacAddress] = new[] { "AT+CIPAPMAC_CUR=", "AT+CIPAPMAC_DEF=" };
+            //_commandSet51[Commands.GetApMacAddress] = new[] { "AT+CIPAPMAC_CUR?", "AT+CIPAPMAC_DEF?" };
+            //_commandSet51[Commands.GetApMacAddressResponse] = new[] { "+CIPAPMAC_CUR:", "+CIPAPMAC_DEF:" };
+            //_commandSet51[Commands.JoinAccessPointCommand] = new[] { "AT+CWJAP_CUR=", "AT+CWJAP_DEF=" };
+        }
+
+        private void Configure(Commands configItem, string args)
+        {
+            lock (_oplock)
+            {
+                _device.SendAndExpect(Command(Commands.ConfigCommand) + Command(configItem) + "," + args, OK, 2000);
+            }
         }
 
         private string Command(Commands cmd, bool persist = false)
         {
-            string result = null;
-            if (_protocol == Protocols.Protocol_51)
-            {
-                var cmds = ((string[]) _commandSet51[cmd]);
-                if (cmds!=null)
-                    result = cmds[persist ? 1 : 0];
-            }
+            string result = ((string)_commandSet[cmd]);
             if (result == null)
-                result = (string)_commandSet40[cmd];
-            if (result==null)
                 throw new Exception("command not supported");
             return result;
         }
 
         private string Response(Commands cmd, bool persist = false)
         {
-            string result = null;
-            if (_protocol == Protocols.Protocol_51)
-            {
-                var cmds = ((string[])_commandSet51[cmd]);
-                if (cmds != null)
-                    result = cmds[persist ? 1 : 0];
-            }
-            if (result == null)
-                result = (string)_commandSet40[cmd];
+            string result = ((string)_commandSet[cmd]);
             if (result == null)
                 throw new Exception("command not supported");
             return result;
@@ -1055,7 +1020,7 @@ namespace PervasiveDigital.Hardware.SPWF04
 
         private void GetStationAddressInfo()
         {
-            var info = _esp.SendAndReadUntil(Command(Commands.GetStationAddressCommand), OK);
+            var info = _device.SendAndReadUntil(Command(Commands.GetStationAddressCommand), OK);
             foreach (var line in info)
             {
                 ParseAddressInfo(line);
@@ -1064,7 +1029,7 @@ namespace PervasiveDigital.Hardware.SPWF04
 
         private void GetApAddressInfo()
         {
-            var info = _esp.SendAndReadUntil(Command(Commands.GetApAddressCommand), OK);
+            var info = _device.SendAndReadUntil(Command(Commands.GetApAddressCommand), OK);
             foreach (var line in info)
             {
                 ParseAddressInfo(line);
@@ -1148,14 +1113,6 @@ namespace PervasiveDigital.Hardware.SPWF04
                 matched = true;
             }
             return matched;
-        }
-        
-        private void SetMuxMode(bool enableMux)
-        {
-            lock (_oplock)
-            {
-                _esp.SendAndExpect(Command(Commands.SetMuxModeCommand) + (enableMux ? '1' : '0'), OK);
-            }
         }
 
         private string Unquote(string quotedString)
