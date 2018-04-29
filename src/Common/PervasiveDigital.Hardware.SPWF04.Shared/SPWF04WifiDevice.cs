@@ -26,6 +26,7 @@ namespace PervasiveDigital.Hardware.SPWF04
             // AT Commands
             ConfigCommand,
             EnableWifiCommand,
+            HttpGet,
             SetSsid,
 
             // Config values
@@ -622,6 +623,32 @@ namespace PervasiveDigital.Hardware.SPWF04
             }
         }
 
+        public void HttpGet(Uri uri, out int code, out string[] response)
+        {
+            var host = uri.Host;
+            var path = uri.PathAndQuery;
+            var port = uri.Port;
+            var isTls = uri.Scheme == Uri.UriSchemeHttps;
+
+            string command = Command(Commands.HttpGet) + host + ',';
+            if (!StringUtilities.IsNullOrEmpty(path))
+                command += path;
+            command += ',';
+            if (!uri.IsDefaultPort)
+                command += port;
+            command += ',';
+            command += (isTls ? "1," : "0,");
+            command += ",,,";
+
+            var reply = _device.SendCommandAndReadReply(command);
+            if (!reply.StartsWith("AT-S.Http Server Status Code:"))
+                throw new Exception("Unexpected response");
+            var idxColon = reply.LastIndexOf(':');
+            code = int.Parse(reply.Substring(idxColon + 1));
+
+            response = _device.SendAndReadUntil(null, OK);
+        }
+
         public IPAddress StationIPAddress
         {
             get { return GetStationIPAddress(); }
@@ -961,6 +988,7 @@ namespace PervasiveDigital.Hardware.SPWF04
         {
             _commandSet[Commands.EnableWifiCommand] = "AT+S.WIFI="; // 0 or 1
             _commandSet[Commands.ConfigCommand] = "AT+S.SCFG=";
+            _commandSet[Commands.HttpGet] = "AT+S.HTTPGET=";
             _commandSet[Commands.SetSsid] = "AT+S.SSIDTXT=";
 
             // config values

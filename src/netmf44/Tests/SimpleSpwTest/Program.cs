@@ -42,6 +42,10 @@ namespace SimpleHttpTest
                 Thread.Sleep(500);
             }
 
+            int code;
+            string[] response;
+            wifi.HttpGet(new Uri("http://www.example.com/"), out code, out response);
+
             int iCounter = 0;
             bool state = true;
             while (true)

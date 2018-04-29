@@ -328,7 +328,7 @@ namespace PervasiveDigital.Hardware.SPWF04
             if (serialDataReceivedEventArgs.EventType == SerialData.Chars)
             {
                 // Keep doing this while there are bytes to read - don't rely on just event notification
-                // The ESP8266 is very timing sensitive and subject to buffer overrun - keep the loop tight.
+                // The device is very timing sensitive and subject to buffer overrun - keep the loop tight.
                 var newInput = ReadExistingBinary();
                 if (newInput != null && newInput.Length > 0)
                 {
@@ -477,7 +477,7 @@ namespace PervasiveDigital.Hardware.SPWF04
                 catch (Exception exc)
                 {
                     // Ignore exceptions - this loop needs to keep running
-                    Debug.Print("Exception in Esp8266.ReadLoop() : " + exc);
+                    Debug.Print("Exception in Spwf04Serial.ReadLoop() : " + exc);
                 }
                 finally
                 {
