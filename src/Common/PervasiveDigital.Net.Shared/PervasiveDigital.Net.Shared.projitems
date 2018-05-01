@@ -17,6 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)HttpRequest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpResponse.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpStatusCode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HttpUtility.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)INetworkAdapter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ISocket.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IWifiAdapter.cs" />

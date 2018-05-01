@@ -63,6 +63,10 @@
       <Project>{D0CF87C0-73B7-4E66-AE4C-D8A27C206F89}</Project>
       <Name>PervasiveDigital.Net.netmf44</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\PervasiveDigital.Security.ManagedProviders\PervasiveDigital.Security.ManagedProviders.netmf44.csproj">
+      <Project>{B1B0EDBE-2ED4-4FB7-8E43-047A32FD64CF}</Project>
+      <Name>PervasiveDigital.Security.ManagedProviders.netmf44</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\PervasiveDigital.Utility\PervasiveDigital.Utility.netmf44.csproj">
       <Project>{9FDDB085-8ABE-40B7-9718-2396F3101B50}</Project>
       <Name>PervasiveDigital.Utility.netmf44</Name>

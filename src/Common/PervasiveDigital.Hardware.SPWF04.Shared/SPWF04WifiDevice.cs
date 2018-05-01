@@ -27,6 +27,7 @@ namespace PervasiveDigital.Hardware.SPWF04
             ConfigCommand,
             EnableWifiCommand,
             HttpGet,
+            MqttConnect,
             SetSsid,
 
             // Config values
@@ -649,6 +650,30 @@ namespace PervasiveDigital.Hardware.SPWF04
             response = _device.SendAndReadUntil(null, OK);
         }
 
+        public void MqttConnect(Uri uri, string username, string password)
+        {
+            var host = uri.Host;
+            var path = uri.PathAndQuery;
+            var port = 8883; // uri.Port;
+            var isTls = uri.Scheme == Uri.UriSchemeHttps;
+
+            string command = Command(Commands.MqttConnect) + host + ',';
+            if (!StringUtilities.IsNullOrEmpty(path))
+                command += path;
+            command += ',';
+            if (!uri.IsDefaultPort)
+                command += port;
+            command += ',';
+            command += (isTls ? "1," : "0,");
+            command += (username + ',');
+            command += (password + ',');
+            command += ("ingenuitymicro.azure-devices.net/devices/redmond01" + ','); // username again, as the UserId
+            command += ",,,,";
+
+            var reply = _device.SendCommandAndReadReply(command);
+
+        }
+
         public IPAddress StationIPAddress
         {
             get { return GetStationIPAddress(); }
@@ -989,6 +1014,7 @@ namespace PervasiveDigital.Hardware.SPWF04
             _commandSet[Commands.EnableWifiCommand] = "AT+S.WIFI="; // 0 or 1
             _commandSet[Commands.ConfigCommand] = "AT+S.SCFG=";
             _commandSet[Commands.HttpGet] = "AT+S.HTTPGET=";
+            _commandSet[Commands.MqttConnect] = "AT+S.MQTTCONN=";
             _commandSet[Commands.SetSsid] = "AT+S.SSIDTXT=";
 
             // config values

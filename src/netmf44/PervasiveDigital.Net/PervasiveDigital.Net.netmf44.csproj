@@ -33,6 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.SPOT.Native" />
+    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PervasiveDigital.Utility\PervasiveDigital.Utility.netmf44.csproj">

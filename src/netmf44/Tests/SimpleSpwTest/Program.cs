@@ -9,6 +9,8 @@ using Microsoft.SPOT.Hardware;
 using PervasiveDigital.Net;
 using PervasiveDigital;
 using PervasiveDigital.Utilities;
+using System.Text;
+using PervasiveDigital.Security.ManagedProviders;
 
 namespace SimpleHttpTest
 {
@@ -25,6 +27,8 @@ namespace SimpleHttpTest
 
         public static void Main()
         {
+            uint foo = Debug.GC(true);
+
             var port = new SerialPort("COM2", 115200, Parity.None, 8, StopBits.One);
             var wifi = new Spwf04WifiDevice(port, null);
 
@@ -44,7 +48,10 @@ namespace SimpleHttpTest
 
             int code;
             string[] response;
-            wifi.HttpGet(new Uri("http://www.example.com/"), out code, out response);
+            //wifi.HttpGet(new Uri("http://www.example.com/"), out code, out response);
+
+            wifi.MqttConnect(new Uri("http://ingenuitymicro.azure-devices.net/"), "ingenuitymicro.azure-devices.net/redmond01/api-version=2016-11-14",
+                GenerateSasToken("ingenuitymicro.azure-devices.net/devices/redmond01", "mKeKt3FDUOQg7U5RQ7Ucm12glq3o3fNsDOKFROo3lS0=", "device"));
 
             int iCounter = 0;
             bool state = true;
@@ -73,6 +80,27 @@ namespace SimpleHttpTest
 //                }
                 Thread.Sleep(500);
             }
+        }
+
+        public static string GenerateSasToken(string resourceUri, string key, string policyName, int expiryInSeconds = 3600)
+        {
+            TimeSpan fromEpochStart = DateTime.UtcNow - new DateTime(1970, 1, 1);
+            double totalSeconds = fromEpochStart.Ticks / 10000000.0;
+            int expiry = ((int)totalSeconds + expiryInSeconds);
+
+            string stringToSign = HttpUtility.UrlEncode(resourceUri) + "\n" + expiry;
+
+            HMACSHA256 hmac = new HMACSHA256(Convert.FromBase64String(key));
+            string signature = Convert.ToBase64String(hmac.ComputeHash(Encoding.UTF8.GetBytes(stringToSign)));
+
+            string token = StringUtilities.Format("SharedAccessSignature sr={0}&sig={1}&se={2}", HttpUtility.UrlEncode(resourceUri), HttpUtility.UrlEncode(signature), expiry.ToString());
+
+            if (!StringUtilities.IsNullOrEmpty(policyName))
+            {
+                token += "&skn=" + policyName;
+            }
+
+            return token;
         }
 
         private static void Wifi_WifiConnectionStateChanged(object sender, bool connected)
