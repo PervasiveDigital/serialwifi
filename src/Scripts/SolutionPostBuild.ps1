@@ -7,7 +7,7 @@ if(-not ($RepoDir -and $SolutionDir -and $ConfigurationName))
 	exit 1
 }
 
-$netmfVersions = "43","44"
+$netmfVersions = "42","43","44"
 $projects = "PervasiveDigital.Diagnostics","PervasiveDigital.Hardware.ESP8266","PervasiveDigital.Net.Azure.MobileServices","PervasiveDigital.Net.Azure.Storage","PervasiveDigital.Net","PervasiveDigital.Security.ManagedProviders","PervasiveDigital.Utility"
 
 function CleanNugetPackage([string]$projectName) {

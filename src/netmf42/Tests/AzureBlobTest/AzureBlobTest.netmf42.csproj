@@ -7,9 +7,10 @@
     <ProjectTypeGuids>{b69e3092-b931-443c-abe7-7e7b65f2a37f};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{D8D48FE3-F89D-4CFD-99C6-AD17123ACC6A}</ProjectGuid>
-    <TargetFrameworkVersion>v4.3</TargetFrameworkVersion>
+    <ProjectGuid>{7E7FBA78-A662-4353-8A1D-BDB5137F224F}</ProjectGuid>
+    <TargetFrameworkVersion>v4.2</TargetFrameworkVersion>
     <NetMfTargetsBaseDir Condition="'$(NetMfTargetsBaseDir)'==''">$(MSBuildExtensionsPath32)\Microsoft\.NET Micro Framework\</NetMfTargetsBaseDir>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -54,21 +55,17 @@
     <None Include="Resources\pdicon-512x512.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\PervasiveDigital.Hardware.ESP8266\PervasiveDigital.Hardware.ESP8266.netmf43.csproj">
-      <Project>{6ACF69A5-42F6-415D-A2E0-E50107F75D4C}</Project>
-      <Name>PervasiveDigital.Hardware.ESP8266.netmf43</Name>
+    <ProjectReference Include="..\..\PervasiveDigital.Hardware.ESP8266\PervasiveDigital.Hardware.ESP8266.netmf42.csproj">
+      <Project>{F9B519D3-BCC8-45DE-9B23-96744825A95E}</Project>
+      <Name>PervasiveDigital.Hardware.ESP8266.netmf42</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\PervasiveDigital.Net.Azure.Storage\PervasiveDigital.Net.Azure.Storage.netmf43.csproj">
-      <Project>{ADFB7B3A-EBA1-48CB-A896-A92AF20389C0}</Project>
-      <Name>PervasiveDigital.Net.Azure.Storage.netmf43</Name>
+    <ProjectReference Include="..\..\PervasiveDigital.Net.Azure.Storage\PervasiveDigital.Net.Azure.Storage.netmf42.csproj">
+      <Project>{B2C92999-D0BF-42AA-8BFC-6D5E76B866B5}</Project>
+      <Name>PervasiveDigital.Net.Azure.Storage.netmf42</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\PervasiveDigital.Net\PervasiveDigital.Net.netmf43.csproj">
-      <Project>{89957C1B-A0EF-487A-9C0B-2B33DA57231E}</Project>
-      <Name>PervasiveDigital.Net.netmf43</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\PervasiveDigital.Utility\PervasiveDigital.Utility.netmf43.csproj">
-      <Project>{C8BD7C9D-9ECE-4E98-A2C3-0B0576538FF6}</Project>
-      <Name>PervasiveDigital.Utility.netmf43</Name>
+    <ProjectReference Include="..\..\PervasiveDigital.Net\PervasiveDigital.Net.netmf42.csproj">
+      <Project>{D91F4C4F-F7CF-4F87-AE21-FE1870AF171F}</Project>
+      <Name>PervasiveDigital.Net.netmf42</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Condition="EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
