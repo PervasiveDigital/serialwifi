@@ -528,7 +528,18 @@ namespace PervasiveDigital.Hardware.ESP8266
                                                      (sock.UseTcp ? "\"TCP\",\"" : "\"UDP\",\"") + sock.Hostname + "\"," +
                                                      sock.Port;
                     reply = _esp.SendCommandAndReadReply(command);
-                    if (reply.ToLower().IndexOf("dns fail") != -1)
+                    if ((reply.ToLower().IndexOf("dns fail") != -1)
+                        /* If we are in SoftAP mode we can get a bunch of messages here:
+                         * WIFI CONNECTED
+                         * WIFI GOT IP
+                         * busy p...
+                         * before our "0,CONNECT" and "OK"
+                         * Started adding special cases, but I think best to change to something like an Expect() with string array?
+                         * For now go back to original and disable AP modes! - DAV 14MAR2020
+                        || (reply.ToLower().IndexOf("busy") != -1)
+                        || (reply.IndexOf("WIFI CONNECTED") != -1)
+                         */
+                        )
                     {
                         success = false; // a retriable failure
                     }
@@ -936,7 +947,7 @@ namespace PervasiveDigital.Hardware.ESP8266
                         // Get the firmware version information
                         this.Version = _esp.SendAndReadUntil(Command(Commands.GetFirmwareVersionCommand), OK);
 
-                        if (this.AtProtocolVersion.StartsWith("0.51"))
+                        if ((this.AtProtocolVersion.StartsWith("1.")) || (this.AtProtocolVersion.StartsWith("0.51")) )
                             _protocol = Protocols.Protocol_51;
                         else
                             _protocol = Protocols.Protocol_40;
