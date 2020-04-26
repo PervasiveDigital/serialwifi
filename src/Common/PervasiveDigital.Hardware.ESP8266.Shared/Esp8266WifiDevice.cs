@@ -20,6 +20,10 @@ namespace PervasiveDigital.Hardware.ESP8266
         private const string OK = "OK";
         private const string ErrorReply = "ERROR";
         private const string ConnectReply = "CONNECT";
+        private const string FailReply = "FAIL";
+        private const string DnsFailReply = "DNS Fail";
+        private static readonly string [] InfoReplies = {"WIFI CONNECTED","WIFI DISCONNECT","WIFI GOT IP","no ip","busy s...","busy p...","dns fail"};
+        private static readonly string[] FailReplies = {FailReply, ErrorReply};
 
         public enum Commands
         {
@@ -70,6 +74,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         public delegate void WifiConnectionStateEventHandler(object sender, EventArgs args);
         public delegate void ServerConnectionOpenedHandler(object sender, WifiSocket socket);
         public delegate void ProgressCallback(string progress);
+        public delegate void WifiInfoEventHandler(object sender, WifiInfoEventArgs args);
 
         private readonly ManualResetEvent _isInitializedEvent = new ManualResetEvent(false);
         private readonly WifiSocket[] _sockets = new WifiSocket[4];
@@ -97,6 +102,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         public event HardwareFaultHandler HardwareFault;
         //public event WifiErrorEventHandler Error;
         //public event WifiConnectionStateEventHandler ConnectionStateChanged;
+        public event WifiInfoEventHandler Info;
 
         private OutputPort _powerPin = null;
         private OutputPort _resetPin = null;
@@ -240,8 +246,14 @@ namespace PervasiveDigital.Hardware.ESP8266
             EnsureInitialized();
             lock (_oplock)
             {
-                var info = _esp.SendAndReadUntil(Command(Commands.JoinAccessPointCommand, persist) + '"' + ssid + "\",\"" + password + '"', OK, JoinTimeout);
+                var info = _esp.SendAndReadUntil(Command(Commands.JoinAccessPointCommand, persist) + '"' + ssid + "\",\"" + password + '"', OK, FailReplies, JoinTimeout);
                 // We are going to ignore the returned address data (which varies for different firmware) and request address data from the chip in the property accessors
+
+                //TODO - Check for ERROR response and throw that exception. Add new exception for FAIL, or perhaps use other generic... DAV 25APR2020
+                if (info.Length>0 && info[info.Length - 1] == FailReply)
+                {
+                    throw new Exception("Connect FAIL");
+                }
             }
         }
 
@@ -528,42 +540,73 @@ namespace PervasiveDigital.Hardware.ESP8266
                                                      (sock.UseTcp ? "\"TCP\",\"" : "\"UDP\",\"") + sock.Hostname + "\"," +
                                                      sock.Port;
                     reply = _esp.SendCommandAndReadReply(command);
-                    if ((reply.ToLower().IndexOf("dns fail") != -1)
-                        /* If we are in SoftAP mode we can get a bunch of messages here:
-                         * WIFI CONNECTED
-                         * WIFI GOT IP
-                         * busy p...
-                         * before our "0,CONNECT" and "OK"
-                         * Started adding special cases, but I think best to change to something like an Expect() with string array?
-                         * For now go back to original and disable AP modes! - DAV 14MAR2020
-                        || (reply.ToLower().IndexOf("busy") != -1)
-                        || (reply.IndexOf("WIFI CONNECTED") != -1)
-                         */
-                        )
+                    do
                     {
-                        success = false; // a retriable failure
-                    }
-                    else if (reply.IndexOf(ConnectReply) == -1) // Some other unexpected response
-                    {
-                        if (reply.IndexOf(ErrorReply) == 0)
+                        if (reply.IndexOf(ConnectReply) > -1)
+                        {
+                            success = true;
+                            break;
+                        }
+
+                        if (CheckInfoMessage(reply))
+                            success = false;
+
+                        if (reply.IndexOf(DnsFailReply) > -1)
+                        {
+                            success = false;
+                            break;
+                        }
+
+                        if (Array.IndexOf(FailReplies, reply) > -1)
                             throw new ErrorException(command);
-                        else
-                            throw new FailedExpectException(Command(Commands.SessionStartCommand), ConnectReply, reply);
-                    }
+
+                        reply = _esp.GetReplyWithTimeout(1000);
+
+                    } while (true);
+ 
                     if (!success)
                         Thread.Sleep(500);
+
                 } while (--retries > 0 && !success);
+
                 if (retries == 0 && !success)
                 {
                     if (reply.IndexOf(ConnectReply) == -1)
                         throw new DnsLookupFailedException(sock.Hostname);
                     throw new FailedExpectException(Command(Commands.SessionStartCommand), ConnectReply, reply);
                 }
+
                 reply = reply.Substring(0, reply.IndexOf(','));
                 if (int.Parse(reply) != socket)
                     throw new Exception("Unexpected socket response");
                 return sock;
             }
+        }
+
+        internal bool CheckInfoMessage(string msg)
+        {
+            int i;
+            if ((i = Array.IndexOf(InfoReplies, msg)) > -1)
+            {
+                WifiInfoEventArgs args = new WifiInfoEventArgs();
+                args.Info = msg;
+                args.Number = i;
+                OnWifiInfo(args);
+                return true;
+            }
+            return false;
+        }
+
+        protected virtual void OnWifiInfo(WifiInfoEventArgs e)
+        {
+            if (this.Info != null)
+                Info(this, e);
+        }
+
+        public class WifiInfoEventArgs : EventArgs
+        {
+            public string Info { get; set; }
+            public int Number { get; set; }
         }
 
         internal void DeleteSocket(int socket)
