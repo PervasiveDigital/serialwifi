@@ -3,7 +3,7 @@
   <metadata>
     <id>PervasiveDigital.Hardware.ESP8266</id>
     <title>ESP8266 driver for .Net Micro Framework</title>
-    <version>3.0.10</version>
+    <version>3.0.12</version>
     <authors>Martin Calsyn</authors>
     <owners>Pervasive Digital LLC</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>

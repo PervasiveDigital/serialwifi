@@ -22,7 +22,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         private const string ConnectReply = "CONNECT";
         private const string FailReply = "FAIL";
         private const string DnsFailReply = "DNS Fail";
-        private static readonly string [] InfoReplies = {"WIFI CONNECTED","WIFI DISCONNECT","WIFI GOT IP","no ip","busy s...","busy p...","dns fail"};
+        private static readonly string [] InfoReplies = {"WIFI CONNECTED","WIFI DISCONNECT","WIFI GOT IP","no ip","busy s...","busy p...",DnsFailReply};
         private static readonly string[] FailReplies = {FailReply, ErrorReply};
 
         public enum Commands
