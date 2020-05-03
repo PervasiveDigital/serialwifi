@@ -140,8 +140,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleHttpTest.netmf42", "n
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateTest.netmf42", "netmf42\Tests\UpdateTest\UpdateTest.netmf42.csproj", "{92545CCF-E08E-4F7C-B77B-D5580CB77AD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CBTest8266", "CBTest8266\CBTest8266.csproj", "{89F088D3-8B06-430A-87E1-3BA9B36B060E}"
-EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Common\PervasiveDigital.Utility.Shared\PervasiveDigital.Utility.Shared.projitems*{4b23ceb3-f360-40b1-a624-33f4bb11d1b8}*SharedItemsImports = 13
@@ -626,16 +624,6 @@ Global
 		{92545CCF-E08E-4F7C-B77B-D5580CB77AD2}.Release|x86.ActiveCfg = Release|Any CPU
 		{92545CCF-E08E-4F7C-B77B-D5580CB77AD2}.Release|x86.Build.0 = Release|Any CPU
 		{92545CCF-E08E-4F7C-B77B-D5580CB77AD2}.Release|x86.Deploy.0 = Release|Any CPU
-		{89F088D3-8B06-430A-87E1-3BA9B36B060E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{89F088D3-8B06-430A-87E1-3BA9B36B060E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{89F088D3-8B06-430A-87E1-3BA9B36B060E}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{89F088D3-8B06-430A-87E1-3BA9B36B060E}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{89F088D3-8B06-430A-87E1-3BA9B36B060E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{89F088D3-8B06-430A-87E1-3BA9B36B060E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{89F088D3-8B06-430A-87E1-3BA9B36B060E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{89F088D3-8B06-430A-87E1-3BA9B36B060E}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{89F088D3-8B06-430A-87E1-3BA9B36B060E}.Release|x64.ActiveCfg = Release|Any CPU
-		{89F088D3-8B06-430A-87E1-3BA9B36B060E}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

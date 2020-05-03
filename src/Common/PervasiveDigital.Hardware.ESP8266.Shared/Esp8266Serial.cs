@@ -100,7 +100,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             {
                 DiscardBufferedInput();
                 WriteCommand(send);
-                Expect(new[] { send, "no change" }, expect, timeout);
+                Expect(new[] { send, "no change", "link is not valid" }, expect, timeout); // TODO Perhaps add generic acceptable array - ESP AT keeps changing. DAV
             }
         }
 

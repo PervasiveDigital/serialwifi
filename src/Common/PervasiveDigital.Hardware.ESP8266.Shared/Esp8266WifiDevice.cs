@@ -579,6 +579,7 @@ namespace PervasiveDigital.Hardware.ESP8266
                 reply = reply.Substring(0, reply.IndexOf(','));
                 if (int.Parse(reply) != socket)
                     throw new Exception("Unexpected socket response");
+                sock.Connected = true;
                 return sock;
             }
         }
