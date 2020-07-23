@@ -81,7 +81,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         private ServerConnectionOpenedHandler _onServerConnectionOpenedHandler;
         private int _inboundPort = -1;
         private Esp8266Serial _esp;
-        private int _lastSocketUsed = 0;
+        private int _lastSocketUsed = -1;
         private bool _enableDebugOutput;
         private bool _enableVerboseOutput;
 
@@ -502,8 +502,10 @@ namespace PervasiveDigital.Hardware.ESP8266
                 // lastSocketUsed is used to make sure that we don't reuse a just-released socket too quickly
                 // It can still happen, but this reduces the probability of it happening if you are using less than five sockets in quick succession.
                 // The chip seems to get upset if we reuse a socket immediately after closing it.
-                for (int i = _lastSocketUsed ; i < _sockets.Length; ++i)
+                int i = _lastSocketUsed + 1;
+                for(int j=0; j < _sockets.Length; ++j,++i)
                 {
+                    if (i >= _sockets.Length) i = 0;
                     if (_sockets[i] == null)
                     {
                         iSocket = i;
