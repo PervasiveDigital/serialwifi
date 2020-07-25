@@ -288,6 +288,8 @@ namespace PervasiveDigital.Hardware.ESP8266
         /// Enter power-saving deep-sleep mode for <paramref name="timeInMs"/> milliseconds.
         /// Note that for wake-up to work, your hardware has to support deep-sleep wake up 
         /// by connecting XPD_DCDC to EXT_RSTB with a zero-ohm resistor.
+        /// A timeInMs of zero causes an indefinite sleep
+        /// You can manually wake by pulsing the reset line low, we do that by passing a timeInMs of -1
         /// </summary>
         /// <param name="timeInMs"></param>
         public void Sleep(int timeInMs)
@@ -295,7 +297,16 @@ namespace PervasiveDigital.Hardware.ESP8266
             EnsureInitialized();
             lock (_oplock)
             {
-                _esp.SendAndExpect(Command(Commands.SleepCommand) + timeInMs.ToString(), OK);
+                if (timeInMs == -1)
+                {
+                    if (_resetPin != null)
+                    {
+                        _resetPin.Write(false);
+                        Thread.Sleep(3);
+                        _resetPin.Write(true);
+                    }                
+                } else
+                    _esp.SendAndExpect(Command(Commands.SleepCommand) + timeInMs.ToString(), OK);
             }
         }
 
@@ -560,7 +571,10 @@ namespace PervasiveDigital.Hardware.ESP8266
                         }
 
                         if (Array.IndexOf(FailReplies, reply) > -1)
+                        {
+                            DeleteSocket(socket);
                             throw new ErrorException(command);
+                        }
 
                         reply = _esp.GetReplyWithTimeout(1000);
 
@@ -580,7 +594,10 @@ namespace PervasiveDigital.Hardware.ESP8266
 
                 reply = reply.Substring(0, reply.IndexOf(','));
                 if (int.Parse(reply) != socket)
+                {
+                    DeleteSocket(socket);
                     throw new Exception("Unexpected socket response");
+                }
                 sock.Connected = true;
                 return sock;
             }
@@ -615,7 +632,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         internal void DeleteSocket(int socket)
         {
             EnsureInitialized();
-            if (socket >= 0 && socket <= _sockets.Length)
+            if (socket >= 0 && socket < _sockets.Length)
             {
                 _sockets[socket] = null;
             }
@@ -626,7 +643,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             EnsureInitialized();
             lock (_oplock)
             {
-                if (socket >= 0 && socket <= _sockets.Length)
+                if (socket >= 0 && socket < _sockets.Length)
                 {
                     _esp.SendAndExpect(Command(Commands.SessionEndCommand) + socket, OK);
                 }

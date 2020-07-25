@@ -10,7 +10,7 @@
   <Version package="PervasiveDigital.Hardware.ESP8266">
     <Major>3</Major>
     <Minor>0</Minor>
-    <Build>14</Build>
+    <Build>17</Build>
     <Revision>0</Revision>
     <Suffix></Suffix>
   </Version>
