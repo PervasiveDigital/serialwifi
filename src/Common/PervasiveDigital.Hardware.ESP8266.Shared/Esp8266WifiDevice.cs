@@ -20,6 +20,10 @@ namespace PervasiveDigital.Hardware.ESP8266
         private const string OK = "OK";
         private const string ErrorReply = "ERROR";
         private const string ConnectReply = "CONNECT";
+        private const string FailReply = "FAIL";
+        private const string DnsFailReply = "DNS Fail";
+        private static readonly string [] InfoReplies = {"WIFI CONNECTED","WIFI DISCONNECT","WIFI GOT IP","no ip","busy s...","busy p...",DnsFailReply};
+        private static readonly string[] FailReplies = {FailReply, ErrorReply};
 
         public enum Commands
         {
@@ -70,13 +74,14 @@ namespace PervasiveDigital.Hardware.ESP8266
         public delegate void WifiConnectionStateEventHandler(object sender, EventArgs args);
         public delegate void ServerConnectionOpenedHandler(object sender, WifiSocket socket);
         public delegate void ProgressCallback(string progress);
+        public delegate void WifiInfoEventHandler(object sender, WifiInfoEventArgs args);
 
         private readonly ManualResetEvent _isInitializedEvent = new ManualResetEvent(false);
         private readonly WifiSocket[] _sockets = new WifiSocket[4];
         private ServerConnectionOpenedHandler _onServerConnectionOpenedHandler;
         private int _inboundPort = -1;
         private Esp8266Serial _esp;
-        private int _lastSocketUsed = 0;
+        private int _lastSocketUsed = -1;
         private bool _enableDebugOutput;
         private bool _enableVerboseOutput;
 
@@ -97,6 +102,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         public event HardwareFaultHandler HardwareFault;
         //public event WifiErrorEventHandler Error;
         //public event WifiConnectionStateEventHandler ConnectionStateChanged;
+        public event WifiInfoEventHandler Info;
 
         private OutputPort _powerPin = null;
         private OutputPort _resetPin = null;
@@ -240,8 +246,14 @@ namespace PervasiveDigital.Hardware.ESP8266
             EnsureInitialized();
             lock (_oplock)
             {
-                var info = _esp.SendAndReadUntil(Command(Commands.JoinAccessPointCommand, persist) + '"' + ssid + "\",\"" + password + '"', OK, JoinTimeout);
+                var info = _esp.SendAndReadUntil(Command(Commands.JoinAccessPointCommand, persist) + '"' + ssid + "\",\"" + password + '"', OK, FailReplies, JoinTimeout);
                 // We are going to ignore the returned address data (which varies for different firmware) and request address data from the chip in the property accessors
+
+                //TODO - Check for ERROR response and throw that exception. Add new exception for FAIL, or perhaps use other generic... DAV 25APR2020
+                if (info.Length>0 && info[info.Length - 1] == FailReply)
+                {
+                    throw new Exception("Connect FAIL");
+                }
             }
         }
 
@@ -276,6 +288,8 @@ namespace PervasiveDigital.Hardware.ESP8266
         /// Enter power-saving deep-sleep mode for <paramref name="timeInMs"/> milliseconds.
         /// Note that for wake-up to work, your hardware has to support deep-sleep wake up 
         /// by connecting XPD_DCDC to EXT_RSTB with a zero-ohm resistor.
+        /// A timeInMs of zero causes an indefinite sleep
+        /// You can manually wake by pulsing the reset line low, we do that by passing a timeInMs of -1
         /// </summary>
         /// <param name="timeInMs"></param>
         public void Sleep(int timeInMs)
@@ -283,7 +297,16 @@ namespace PervasiveDigital.Hardware.ESP8266
             EnsureInitialized();
             lock (_oplock)
             {
-                _esp.SendAndExpect(Command(Commands.SleepCommand) + timeInMs.ToString(), OK);
+                if (timeInMs == -1)
+                {
+                    if (_resetPin != null)
+                    {
+                        _resetPin.Write(false);
+                        Thread.Sleep(3);
+                        _resetPin.Write(true);
+                    }                
+                } else
+                    _esp.SendAndExpect(Command(Commands.SleepCommand) + timeInMs.ToString(), OK);
             }
         }
 
@@ -490,8 +513,10 @@ namespace PervasiveDigital.Hardware.ESP8266
                 // lastSocketUsed is used to make sure that we don't reuse a just-released socket too quickly
                 // It can still happen, but this reduces the probability of it happening if you are using less than five sockets in quick succession.
                 // The chip seems to get upset if we reuse a socket immediately after closing it.
-                for (int i = _lastSocketUsed ; i < _sockets.Length; ++i)
+                int i = _lastSocketUsed + 1;
+                for(int j=0; j < _sockets.Length; ++j,++i)
                 {
+                    if (i >= _sockets.Length) i = 0;
                     if (_sockets[i] == null)
                     {
                         iSocket = i;
@@ -528,37 +553,86 @@ namespace PervasiveDigital.Hardware.ESP8266
                                                      (sock.UseTcp ? "\"TCP\",\"" : "\"UDP\",\"") + sock.Hostname + "\"," +
                                                      sock.Port;
                     reply = _esp.SendCommandAndReadReply(command);
-                    if (reply.ToLower().IndexOf("dns fail") != -1)
+                    do
                     {
-                        success = false; // a retriable failure
-                    }
-                    else if (reply.IndexOf(ConnectReply) == -1) // Some other unexpected response
-                    {
-                        if (reply.IndexOf(ErrorReply) == 0)
+                        if (reply.IndexOf(ConnectReply) > -1)
+                        {
+                            success = true;
+                            break;
+                        }
+
+                        if (CheckInfoMessage(reply))
+                            success = false;
+
+                        if (reply.IndexOf(DnsFailReply) > -1)
+                        {
+                            success = false;
+                            break;
+                        }
+
+                        if (Array.IndexOf(FailReplies, reply) > -1)
+                        {
+                            DeleteSocket(socket);
                             throw new ErrorException(command);
-                        else
-                            throw new FailedExpectException(Command(Commands.SessionStartCommand), ConnectReply, reply);
-                    }
+                        }
+
+                        reply = _esp.GetReplyWithTimeout(1000);
+
+                    } while (true);
+ 
                     if (!success)
                         Thread.Sleep(500);
+
                 } while (--retries > 0 && !success);
+
                 if (retries == 0 && !success)
                 {
                     if (reply.IndexOf(ConnectReply) == -1)
                         throw new DnsLookupFailedException(sock.Hostname);
                     throw new FailedExpectException(Command(Commands.SessionStartCommand), ConnectReply, reply);
                 }
+
                 reply = reply.Substring(0, reply.IndexOf(','));
                 if (int.Parse(reply) != socket)
+                {
+                    DeleteSocket(socket);
                     throw new Exception("Unexpected socket response");
+                }
+                sock.Connected = true;
                 return sock;
             }
+        }
+
+        internal bool CheckInfoMessage(string msg)
+        {
+            int i;
+            if ((i = Array.IndexOf(InfoReplies, msg)) > -1)
+            {
+                WifiInfoEventArgs args = new WifiInfoEventArgs();
+                args.Info = msg;
+                args.Number = i;
+                OnWifiInfo(args);
+                return true;
+            }
+            return false;
+        }
+
+        protected virtual void OnWifiInfo(WifiInfoEventArgs e)
+        {
+            if (this.Info != null)
+                Info(this, e);
+        }
+
+        public class WifiInfoEventArgs : EventArgs
+        {
+            public string Info { get; set; }
+            public int Number { get; set; }
         }
 
         internal void DeleteSocket(int socket)
         {
             EnsureInitialized();
-            if (socket >= 0 && socket <= _sockets.Length)
+            if (socket >= 0 && socket < _sockets.Length)
             {
                 _sockets[socket] = null;
             }
@@ -569,7 +643,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             EnsureInitialized();
             lock (_oplock)
             {
-                if (socket >= 0 && socket <= _sockets.Length)
+                if (socket >= 0 && socket < _sockets.Length)
                 {
                     _esp.SendAndExpect(Command(Commands.SessionEndCommand) + socket, OK);
                 }
@@ -936,7 +1010,7 @@ namespace PervasiveDigital.Hardware.ESP8266
                         // Get the firmware version information
                         this.Version = _esp.SendAndReadUntil(Command(Commands.GetFirmwareVersionCommand), OK);
 
-                        if (this.AtProtocolVersion.StartsWith("0.51"))
+                        if ((this.AtProtocolVersion.StartsWith("1.")) || (this.AtProtocolVersion.StartsWith("0.51")) )
                             _protocol = Protocols.Protocol_51;
                         else
                             _protocol = Protocols.Protocol_40;

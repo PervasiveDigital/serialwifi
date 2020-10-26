@@ -49,6 +49,20 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\PervasiveDigital.Hardware.ESP8266\PervasiveDigital.Hardware.ESP8266.netmf43.csproj">
+      <Project>{6ACF69A5-42F6-415D-A2E0-E50107F75D4C}</Project>
+      <Name>PervasiveDigital.Hardware.ESP8266.netmf43</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PervasiveDigital.Net\PervasiveDigital.Net.netmf43.csproj">
+      <Project>{89957C1B-A0EF-487A-9C0B-2B33DA57231E}</Project>
+      <Name>PervasiveDigital.Net.netmf43</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PervasiveDigital.Utility\PervasiveDigital.Utility.netmf43.csproj">
+      <Project>{C8BD7C9D-9ECE-4E98-A2C3-0B0576538FF6}</Project>
+      <Name>PervasiveDigital.Utility.netmf43</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Condition="EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <Import Condition="!EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

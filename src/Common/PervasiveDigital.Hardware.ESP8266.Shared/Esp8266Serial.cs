@@ -100,7 +100,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             {
                 DiscardBufferedInput();
                 WriteCommand(send);
-                Expect(new[] { send, "no change" }, expect, timeout);
+                Expect(new[] { send, "no change", "link is not valid" }, expect, timeout); // TODO Perhaps add generic acceptable array - ESP AT keeps changing. DAV
             }
         }
 
@@ -134,6 +134,11 @@ namespace PervasiveDigital.Hardware.ESP8266
 
         public string[] SendAndReadUntil(string send, string terminator, int timeout)
         {
+            return SendAndReadUntil(send, terminator, null, timeout);
+        }
+
+        public string[] SendAndReadUntil(string send, string terminator, string[]badresp, int timeout)
+        {
             ArrayList result = new ArrayList();
             if (send != null)
                 SendCommand(send);
@@ -149,6 +154,11 @@ namespace PervasiveDigital.Hardware.ESP8266
                     if (line.IndexOf(terminator) == 0)
                         break;
                     result.Add(line);
+                    if (badresp != null)
+                    {
+                        if (Array.IndexOf(badresp, line) > -1)
+                            break;
+                    }
                 }
             } while (true);
             return (string[])result.ToArray(typeof(string));

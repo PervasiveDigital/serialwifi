@@ -12,6 +12,7 @@ namespace PervasiveDigital.Hardware.ESP8266
         private readonly int _port;
         private readonly bool _fTcp;
         private int _iSocket;
+        private bool _bConnected;
 
         public event SocketReceivedDataEventHandler DataReceived;
         public event SocketClosedEventHandler SocketClosed;
@@ -23,6 +24,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             _hostname = hostname;
             _port = port;
             _fTcp = fTcp;
+            _bConnected = false;
         }
 
         internal WifiSocket(Esp8266WifiDevice device, int iSocket, int port)
@@ -32,6 +34,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             _port = port;
             _hostname = null;
             _fTcp = true; // TEMP CODE
+            _bConnected = false;
         }
 
         public int Id { get { return _iSocket; } }
@@ -41,6 +44,12 @@ namespace PervasiveDigital.Hardware.ESP8266
         public int Port { get {  return _port; } }
         
         public bool UseTcp { get { return _fTcp; } }
+
+        public bool Connected
+        {
+            get { return _bConnected; }
+            set { _bConnected = value; }
+        }
 
         public void Dispose()
         {
@@ -78,8 +87,14 @@ namespace PervasiveDigital.Hardware.ESP8266
 
         public void Close()
         {
-            if (_iSocket!=-1)
-                _parent.CloseSocket(_iSocket);
+            if (_iSocket != -1)
+            {
+                if (_bConnected)
+                {
+                    _parent.CloseSocket(_iSocket);
+                    _bConnected = false;
+                }
+            }
         }
 
         internal void ReceivedData(byte[] data)
@@ -94,6 +109,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             {
                 SocketClosed(this, EventArgs.Empty);
             }
+            _bConnected = false;
         }
     }
 }
