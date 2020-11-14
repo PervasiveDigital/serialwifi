@@ -55,7 +55,7 @@ namespace PervasiveDigital.Utilities
                 if (source == check)
                     return true;
 
-                for (int i = 0; i < source.Length; i++)
+                for (int i = 0; i <= (source.Length-check.Length); i++)
                 {
                     if (source.Substring(i, check.Length) == check)
                         return true;
