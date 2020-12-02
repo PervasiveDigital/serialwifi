@@ -10,14 +10,14 @@
   <Version package="PervasiveDigital.Hardware.ESP8266">
     <Major>3</Major>
     <Minor>0</Minor>
-    <Build>17</Build>
+    <Build>24</Build>
     <Revision>0</Revision>
     <Suffix></Suffix>
   </Version>
   <Version package="PervasiveDigital.Net">
     <Major>3</Major>
     <Minor>0</Minor>
-    <Build>11</Build>
+    <Build>12</Build>
     <Revision>0</Revision>
     <Suffix></Suffix>
   </Version>
@@ -45,7 +45,7 @@
   <Version package="PervasiveDigital.Utility">
     <Major>3</Major>
     <Minor>0</Minor>
-    <Build>11</Build>
+    <Build>12</Build>
     <Revision>0</Revision>
     <Suffix></Suffix>
   </Version>

@@ -52,6 +52,7 @@ namespace PervasiveDigital.Hardware.ESP8266
            GetApMacAddressResponse,
            SetApMacAddress,
            ListAccessPointsCommand,
+           ListAccessPointsSortCommand,
            JoinAccessPointCommand,
            QuitAccessPointCommand,
            ListConnectedClientsCommand,
@@ -199,6 +200,48 @@ namespace PervasiveDigital.Hardware.ESP8266
             lock (_oplock)
             {
                 _esp.SendAndReadUntil(Command(Commands.RestoreCommand), OK);
+            }
+        }
+
+        /// <summary>
+        /// See if device is responsive to AT commands on serial
+        /// It may be down, or out of sync, etc
+        /// We can use this if we think it should be responsive, and if fails we can reset the device and/or the library
+        /// </summary>
+        /// <returns>true if device responds</returns>
+        public bool IsAlive()
+        {
+            bool pingSuccess = false;
+            int pingRetries = 2;
+            do
+            {
+                try
+                {
+                    _esp.SendAndExpect(AT, OK, 1000);
+                    pingSuccess = true;
+                }
+                catch (FailedExpectException)
+                {
+                    Thread.Sleep(1000);
+                }
+                catch (Exception e)
+                {
+                    Debug.Print("No Response: " + e.Message);
+                }
+            } while (--pingRetries > 0 && !pingSuccess);
+            return pingSuccess;
+        }
+
+        /// <summary>
+        /// Reset serial port
+        /// </summary>
+        public void ResetPort()
+        {
+            if (_esp != null)
+            {
+                //TODO - DAV Com port seems to wedge occasionally - try this, else Dispose and make a new one?
+                _esp.Stop();
+                _esp.Start();
             }
         }
 
@@ -851,7 +894,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             }
         }
 
-        public AccessPoint[] GetAccessPoints()
+        public AccessPoint[] GetAccessPoints(bool sorted = false)
         {
             ArrayList result = new ArrayList();
 
@@ -860,6 +903,9 @@ namespace PervasiveDigital.Hardware.ESP8266
             {
                 //if (this.Mode != OperatingMode.Station)
                 //    throw new Exception("You must be in 'Station' mode to retrieve access points.");
+
+                if(sorted)
+                    _esp.SendAndReadUntil(Command(Commands.ListAccessPointsSortCommand), OK);
 
                 var response = _esp.SendAndReadUntil(Command(Commands.ListAccessPointsCommand), OK);
                 foreach (var line in response)
@@ -894,7 +940,7 @@ namespace PervasiveDigital.Hardware.ESP8266
                 {
                     if (line != null && line.Length > 0)
                     {
-                        result.Add(line);
+                        //result.Add(line);
                         var tokens = line.Split(',');
                         if (tokens.Length > 1)
                         {
@@ -982,6 +1028,10 @@ namespace PervasiveDigital.Hardware.ESP8266
                         {
                             try
                             {
+                                // Give it a nudge in case com port wedged
+                                if(pingRetries == 5)
+                                    ResetPort();
+
                                 _esp.SendAndExpect(AT, OK, 1000);
                                 pingSuccess = true;
                             }
@@ -998,6 +1048,8 @@ namespace PervasiveDigital.Hardware.ESP8266
                             break;
                         if (_powerPin!=null)
                             _powerPin.Write(false);
+                        // And reset the comport
+                        ResetPort();
                     }
 
                     success = false;
@@ -1059,6 +1111,7 @@ namespace PervasiveDigital.Hardware.ESP8266
             _commandSet40[Commands.GetApMacAddressResponse] = "+CIPAPMAC:";
             _commandSet40[Commands.SetApMacAddress] = "AT+CIPAPMAC=";
             _commandSet40[Commands.ListAccessPointsCommand] = "AT+CWLAP";
+            _commandSet40[Commands.ListAccessPointsSortCommand] = "AT+CWLAPOPT=1,31";
             _commandSet40[Commands.JoinAccessPointCommand] = "AT+CWJAP=";
             _commandSet40[Commands.QuitAccessPointCommand] = "AT+CWQAP";
             _commandSet40[Commands.ListConnectedClientsCommand] = "AT+CWLIF";

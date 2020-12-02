@@ -287,7 +287,8 @@ namespace PervasiveDigital.Hardware.ESP8266
         public void DiscardBufferedInput()
         {
             // you cannot discard input if a stream read is in progress
-            _noStreamRead.WaitOne();
+            if(!_noStreamRead.WaitOne(10000,false))   //TODO DAV - Review. Had to add timeout as we are getting deadlocked here
+                Debug.Print("noStreamRead never released");
             Monitor.Enter(_readLoopMonitor);
             try
             {
